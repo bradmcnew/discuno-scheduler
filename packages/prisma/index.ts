@@ -1,6 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import { PrismaClient as PrismaClientWithoutExtension } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { existsSync, readdirSync, accessSync, constants } from "fs";
+import { join, resolve } from "path";
 
 import { bookingIdempotencyKeyExtension } from "./extensions/booking-idempotency-key";
 import { disallowUndefinedDeleteUpdateManyExtension } from "./extensions/disallow-undefined-delete-update-many";
@@ -8,6 +10,29 @@ import { excludeLockedUsersExtension } from "./extensions/exclude-locked-users";
 import { excludePendingPaymentsExtension } from "./extensions/exclude-pending-payment-teams";
 import { usageTrackingExtention } from "./extensions/usage-tracking";
 import { bookingReferenceMiddleware } from "./middleware";
+
+// Force cert bundle to be included in the build
+const cwd = process.cwd();
+
+const certDir = join(cwd, "certs");
+console.log("🔍 [Prisma] certDir path:", certDir);
+console.log("🔍 [Prisma] certDir exists:", existsSync(certDir));
+if (existsSync(certDir)) {
+  console.log("🔍 [Prisma] certDir contents:", readdirSync(certDir));
+}
+
+// resolve the exact cert file path
+const certRel = join("certs", "prod-ca-2021.crt");
+const certPath = resolve(cwd, certRel);
+console.log("🔍 [Prisma] looking for cert at:", certPath);
+
+try {
+  accessSync(certPath, constants.R_OK);
+  console.log("✅ [Prisma] certificate found at:", certPath);
+} catch (err) {
+  console.error("❌ [Prisma] certificate missing:", certPath, "-", (err as Error).message);
+}
+// ───────────────────────────────────────────────────────────────────────
 
 const prismaOptions: Prisma.PrismaClientOptions = {};
 
