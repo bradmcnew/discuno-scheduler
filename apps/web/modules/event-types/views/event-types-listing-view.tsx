@@ -146,15 +146,19 @@ const InfiniteTeamsTab: FC<InfiniteTeamsTabProps> = (props) => {
           debouncedSearchTerm={debouncedSearchTerm}
         />
       )}
-      <div className="text-default p-4 text-center" ref={buttonInView.ref}>
-        <Button
-          color="minimal"
-          loading={query.isFetchingNextPage}
-          disabled={!query.hasNextPage}
-          onClick={() => query.fetchNextPage()}>
-          {query.hasNextPage ? t("load_more_results") : t("no_more_results")}
-        </Button>
-      </div>
+      {/* [DISCUNO CUSTOMIZATION] Hide load more/no more results in simple mode */}
+      {!isSimpleMode && (
+        <div className="text-default p-4 text-center" ref={buttonInView.ref}>
+          <Button
+            color="minimal"
+            loading={query.isFetchingNextPage}
+            disabled={!query.hasNextPage}
+            onClick={() => query.fetchNextPage()}>
+            {query.hasNextPage ? t("load_more_results") : t("no_more_results")}
+          </Button>
+        </div>
+      )}
+      {/* [DISCUNO CUSTOMIZATION] End */}
     </div>
   );
 };
