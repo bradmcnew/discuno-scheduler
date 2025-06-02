@@ -554,126 +554,139 @@ export const InfiniteEventTypeList = ({
                               </Tooltip>
                             </>
                           )}
+                          {!isSimpleMode && (
+                            <ButtonGroup combined>
+                              {!isManagedEventType && (
+                                <>
+                                  <Tooltip content={t("preview")}>
+                                    <Button
+                                      data-testid="preview-link-button"
+                                      color="secondary"
+                                      target="_blank"
+                                      variant="icon"
+                                      href={calLink}
+                                      StartIcon="external-link"
+                                    />
+                                  </Tooltip>
 
-                          <ButtonGroup combined>
-                            {!isManagedEventType && (
-                              <>
-                                <Tooltip content={t("preview")}>
-                                  <Button
-                                    data-testid="preview-link-button"
-                                    color="secondary"
-                                    target="_blank"
-                                    variant="icon"
-                                    href={calLink}
-                                    StartIcon="external-link"
-                                  />
-                                </Tooltip>
-
-                                <Tooltip content={t("copy_link")}>
-                                  <Button
-                                    color="secondary"
-                                    variant="icon"
-                                    StartIcon="link"
-                                    onClick={() => {
-                                      showToast(t("link_copied"), "success");
-                                      copyToClipboard(calLink);
-                                    }}
-                                  />
-                                </Tooltip>
-
-                                {isPrivateURLEnabled && (
-                                  <Tooltip content={t("copy_private_link_to_event")}>
+                                  <Tooltip content={t("copy_link")}>
                                     <Button
                                       color="secondary"
                                       variant="icon"
-                                      StartIcon="venetian-mask"
+                                      StartIcon="link"
                                       onClick={() => {
-                                        showToast(t("private_link_copied"), "success");
-                                        copyToClipboard(placeholderHashedLink);
-                                        setPrivateLinkCopyIndices((prev) => {
-                                          const prevIndex = prev[type.slug] ?? 0;
-                                          prev[type.slug] = (prevIndex + 1) % type.hashedLink.length;
-                                          return prev;
-                                        });
+                                        showToast(t("link_copied"), "success");
+                                        copyToClipboard(calLink);
                                       }}
                                     />
                                   </Tooltip>
-                                )}
-                              </>
-                            )}
-                            <Dropdown modal={false}>
-                              <DropdownMenuTrigger asChild data-testid={`event-type-options-${type.id}`}>
-                                <Button
-                                  type="button"
-                                  variant="icon"
-                                  color="secondary"
-                                  StartIcon="ellipsis"
-                                  // Unusual practice to use radix state open but for some reason this dropdown and only this dropdown clears the border radius of this button.
-                                  className="ltr:radix-state-open:rounded-r-[--btn-group-radius] rtl:radix-state-open:rounded-l-[--btn-group-radius]"
-                                />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                {!readOnly && (
-                                  <DropdownMenuItem>
-                                    <DropdownItem
-                                      type="button"
-                                      data-testid={`event-type-edit-${type.id}`}
-                                      StartIcon="pencil"
-                                      onClick={() => router.push(`/event-types/${type.id}`)}>
-                                      {t("edit")}
-                                    </DropdownItem>
-                                  </DropdownMenuItem>
-                                )}
-                                {/* readonly is only set when we are on a team - if we are on a user event type null will be the value. */}
-                                {!readOnly && !isManagedEventType && !isChildrenManagedEventType && (
-                                  <>
-                                    <DropdownMenuItem className="outline-none">
-                                      <DropdownItem
-                                        type="button"
-                                        data-testid={`event-type-duplicate-${type.id}`}
-                                        StartIcon="copy"
-                                        onClick={() => openDuplicateModal(type, group)}>
-                                        {t("duplicate")}
-                                      </DropdownItem>
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                                {!isManagedEventType && (
-                                  <DropdownMenuItem className="outline-none">
-                                    <EventTypeEmbedButton
-                                      namespace={type.slug}
-                                      as={DropdownItem}
-                                      type="button"
-                                      StartIcon="code"
-                                      className="w-full rounded-none"
-                                      embedUrl={encodeURIComponent(embedLink)}
-                                      eventId={type.id}>
-                                      {t("embed")}
-                                    </EventTypeEmbedButton>
-                                  </DropdownMenuItem>
-                                )}
-                                {/* readonly is only set when we are on a team - if we are on a user event type null will be the value. */}
-                                {!readOnly && !isChildrenManagedEventType && (
-                                  <>
-                                    <DropdownMenuSeparator />
+
+                                  {isPrivateURLEnabled && (
+                                    <Tooltip content={t("copy_private_link_to_event")}>
+                                      <Button
+                                        color="secondary"
+                                        variant="icon"
+                                        StartIcon="venetian-mask"
+                                        onClick={() => {
+                                          showToast(t("private_link_copied"), "success");
+                                          copyToClipboard(placeholderHashedLink);
+                                          setPrivateLinkCopyIndices((prev) => {
+                                            const prevIndex = prev[type.slug] ?? 0;
+                                            prev[type.slug] = (prevIndex + 1) % type.hashedLink.length;
+                                            return prev;
+                                          });
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  )}
+                                </>
+                              )}
+                              <Dropdown modal={false}>
+                                <DropdownMenuTrigger asChild data-testid={`event-type-options-${type.id}`}>
+                                  <Button
+                                    type="button"
+                                    variant="icon"
+                                    color="secondary"
+                                    StartIcon="ellipsis"
+                                    // Unusual practice to use radix state open but for some reason this dropdown and only this dropdown clears the border radius of this button.
+                                    className="ltr:radix-state-open:rounded-r-[--btn-group-radius] rtl:radix-state-open:rounded-l-[--btn-group-radius]"
+                                  />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  {!readOnly && (
                                     <DropdownMenuItem>
                                       <DropdownItem
-                                        color="destructive"
-                                        onClick={() => {
-                                          setDeleteDialogOpen(true);
-                                          setDeleteDialogTypeId(type.id);
-                                          setDeleteDialogSchedulingType(type.schedulingType);
-                                        }}
-                                        StartIcon="trash"
-                                        className="w-full rounded-none">
-                                        {t("delete")}
+                                        type="button"
+                                        data-testid={`event-type-edit-${type.id}`}
+                                        StartIcon="pencil"
+                                        onClick={() => router.push(`/event-types/${type.id}`)}>
+                                        {t("edit")}
                                       </DropdownItem>
                                     </DropdownMenuItem>
-                                  </>
-                                )}
-                              </DropdownMenuContent>
-                            </Dropdown>
-                          </ButtonGroup>
+                                  )}
+                                  {/* readonly is only set when we are on a team - if we are on a user event type null will be the value. */}
+                                  {!readOnly && !isManagedEventType && !isChildrenManagedEventType && (
+                                    <>
+                                      <DropdownMenuItem className="outline-none">
+                                        <DropdownItem
+                                          type="button"
+                                          data-testid={`event-type-duplicate-${type.id}`}
+                                          StartIcon="copy"
+                                          onClick={() => openDuplicateModal(type, group)}>
+                                          {t("duplicate")}
+                                        </DropdownItem>
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
+                                  {!isManagedEventType && (
+                                    <DropdownMenuItem className="outline-none">
+                                      <EventTypeEmbedButton
+                                        namespace={type.slug}
+                                        as={DropdownItem}
+                                        type="button"
+                                        StartIcon="code"
+                                        className="w-full rounded-none"
+                                        embedUrl={encodeURIComponent(embedLink)}
+                                        eventId={type.id}>
+                                        {t("embed")}
+                                      </EventTypeEmbedButton>
+                                    </DropdownMenuItem>
+                                  )}
+                                  {/* readonly is only set when we are on a team - if we are on a user event type null will be the value. */}
+                                  {!readOnly && !isChildrenManagedEventType && (
+                                    <>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItem>
+                                        <DropdownItem
+                                          color="destructive"
+                                          onClick={() => {
+                                            setDeleteDialogOpen(true);
+                                            setDeleteDialogTypeId(type.id);
+                                            setDeleteDialogSchedulingType(type.schedulingType);
+                                          }}
+                                          StartIcon="trash"
+                                          className="w-full rounded-none">
+                                          {t("delete")}
+                                        </DropdownItem>
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
+                                </DropdownMenuContent>
+                              </Dropdown>
+                            </ButtonGroup>
+                          )}
+                          {isSimpleMode && (
+                            <Tooltip content={t("edit")}>
+                              <Button
+                                color="secondary"
+                                variant="icon"
+                                data-testid={`event-type-edit-${type.id}`}
+                                StartIcon="pencil"
+                                onClick={() => router.push(`/event-types/${type.id}`)}>
+                                {t("edit")}
+                              </Button>
+                            </Tooltip>
+                          )}
                         </div>
                       </div>
                     </div>
