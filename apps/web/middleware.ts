@@ -15,6 +15,109 @@ const safeGet = async <T = any>(key: string): Promise<T | undefined> => {
   }
 };
 
+// https://mentor.discuno.com/*
+const BLOCKED_PATHS = [
+  // Pages
+  "/teams",
+  "/routing",
+  "/workflows",
+  "/enterprise",
+  "/org/",
+  "/team/",
+  "/more",
+  "/connect-and-join",
+  "/upgrade",
+  "/refer",
+  "/payment",
+  "/settings/security/impersonation",
+  "/settings/security/sso",
+  "/settings/my-account/out-of-office",
+  "/settings/billing",
+  "/settings/developer/webhooks",
+  "/settings/developer/api-keys",
+  "/settings/teams/new",
+  // API paths
+  "/api/video/recording",
+  "/api/version",
+  "/api/user/referrals-token",
+  "/api/teams",
+  "/api/me",
+  "/api/intercom-hash",
+  "/api/email",
+  "/auth/oidc",
+  "/auth/saml",
+  // tRPC paths (corrected)
+  "/api/trpc/teams",
+  "/api/trpc/organizations",
+  "/api/trpc/workflows",
+  "/api/trpc/webhook",
+  "/api/trpc/apiKeys",
+  "/api/trpc/insights",
+  "/api/trpc/saml",
+  "/api/trpc/dsync",
+  "/api/trpc/oAuth",
+  "/api/trpc/googleWorkspace",
+  "/api/trpc/delegationCredential",
+  "/api/trpc/routingForms",
+  "/api/trpc/appRoutingForms",
+  "/api/trpc/appBasecamp3",
+  "/api/trpc/attributes",
+  "/api/trpc/ooo",
+  "/api/trpc/calVideo",
+  "/api/trpc/availability/team",
+];
+
+// https://mentor.discuno.com/event-types/##?tabName=*
+const BLOCKED_TABS = ["workflows", "webhooks", "recurring", "limits", "advanced"];
+
+const BLOCKED_DIALOG = ["new", "embed"];
+
+const checkSimplemode = (req: NextRequest): NextResponse | null => {
+  const isSimpleMode = process.env.SIMPLE_MODE === "true";
+
+  if (!isSimpleMode) {
+    return null;
+  }
+
+  const pathname = req.nextUrl.pathname;
+  const searchParams = req.nextUrl.searchParams;
+
+  // Check if the path is blocked
+  const isBlockedPath = BLOCKED_PATHS.some((blockedPath) => {
+    const isBlocked = pathname.startsWith(blockedPath);
+    return isBlocked;
+  });
+
+  if (isBlockedPath) {
+    return new NextResponse(null, { status: 404, statusText: "Not Found" });
+  }
+
+  // Check if event type tab is blocked
+  if (pathname.startsWith("/event-types/")) {
+    const tabName = searchParams.get("tabName");
+    if (tabName && BLOCKED_TABS.includes(tabName)) {
+      return new NextResponse(null, { status: 404, statusText: "Not Found" });
+    }
+  }
+
+  // Check if event type dialog is blocked
+  if (pathname === "/event-types") {
+    const dialog = searchParams.get("dialog");
+    if (dialog && BLOCKED_DIALOG.includes(dialog)) {
+      return new NextResponse(null, { status: 404, statusText: "Not Found" });
+    }
+  }
+
+  if (pathname.startsWith("/availability")) {
+    const type = searchParams.get("type");
+    if (type && type === "team") {
+      return new NextResponse(null, { status: 404, statusText: "Not Found" });
+    }
+  }
+
+  return null;
+};
+
 export const POST_METHODS_ALLOWED_API_ROUTES = ["/api/auth/signup", "/api/trpc/"];
 export function checkPostMethod(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -39,6 +142,10 @@ export function checkStaticFiles(pathname: string) {
 }
 
 const middleware = async (req: NextRequest): Promise<NextResponse<unknown>> => {
+  // Route blocking middleware
+  const simpleModeBlocked = checkSimplemode(req);
+  if (simpleModeBlocked) return simpleModeBlocked;
+  //--------------------------------------
   const postCheckResult = checkPostMethod(req);
   if (postCheckResult) return postCheckResult;
 
@@ -168,6 +275,64 @@ export const config = {
   // WARNING: DO NOT ADD AN ENDING SLASH "/" TO THE PATHS BELOW
   // THIS WILL MAKE THEM NOT MATCH AND HENCE NOT HIT MIDDLEWARE
   matcher: [
+    // Simple mode blocked paths - UI routes
+    "/teams/:path*",
+    "/routing/:path*",
+    "/workflows/:path*",
+    "/enterprise/:path*",
+    "/org/:path*",
+    "/team/:path*",
+    "/more/:path*",
+    "/connect-and-join/:path*",
+    "/upgrade/:path*",
+    "/refer/:path*",
+    "/payment/:path*",
+    "/settings/security/:path*",
+    "/settings/billing/:path*",
+    "/settings/developer/:path*",
+    "/settings/teams/:path*",
+    "/settings/my-account/out-of-office/:path*",
+
+    // Simple mode blocked paths - API routes
+    "/api/video/recording/:path*",
+    "/api/version/:path*",
+    "/api/user/referrals-token/:path*",
+    "/api/teams/:path*",
+    "/api/me/:path*",
+    "/api/intercom-hash/:path*",
+    "/api/email/:path*",
+
+    // Simple mode blocked paths - Auth routes
+    "/auth/oidc/:path*",
+    "/auth/saml/:path*",
+
+    // Simple mode blocked paths - tRPC routes
+    "/api/trpc/teams/:path*",
+    "/api/trpc/organizations/:path*",
+    "/api/trpc/workflows/:path*",
+    "/api/trpc/webhook/:path*",
+    "/api/trpc/apiKeys/:path*",
+    "/api/trpc/insights/:path*",
+    "/api/trpc/saml/:path*",
+    "/api/trpc/dsync/:path*",
+    "/api/trpc/oAuth/:path*",
+    "/api/trpc/googleWorkspace/:path*",
+    "/api/trpc/delegationCredential/:path*",
+    "/api/trpc/routingForms/:path*",
+    "/api/trpc/appRoutingForms/:path*",
+    "/api/trpc/appBasecamp3/:path*",
+    "/api/trpc/attributes/:path*",
+    "/api/trpc/ooo/:path*",
+    "/api/trpc/calVideo/:path*",
+    "/api/trpc/availability/team/:path*",
+
+    // Event types with query parameters
+    "/event-types/:path*",
+
+    // Availability with query parameters
+    "/availability/:path*",
+
+    // --------------------------------------
     // Routes to enforce CSP
     "/auth/login",
     "/login",
