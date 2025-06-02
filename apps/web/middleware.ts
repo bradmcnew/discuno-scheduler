@@ -331,9 +331,7 @@ export const config = {
     "/api/trpc/ooo/:path*",
     "/api/trpc/calVideo/:path*",
     "/api/trpc/availability/team/:path*",
-    "/api/trpc/eventTypes/create/:path*",
-    "/api/trpc/eventTypes/delete/:path*",
-    "/api/trpc/eventTypes/duplicate/:path*",
+    "/api/trpc/eventTypes/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",

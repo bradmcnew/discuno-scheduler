@@ -32,6 +32,10 @@ import { Tooltip } from "@calcom/ui/components/tooltip";
 import { Shell as PlatformShell } from "../../../platform/atoms/src/components/ui/shell";
 import { DeleteDialog } from "./dialogs/DeleteDialog";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type Props = {
   children: React.ReactNode;
   eventType: EventTypeSetupProps["eventType"];
@@ -140,126 +144,138 @@ function EventTypeSingleLayout({
             </>
           )}
 
+          {/* [DISCUNO CUSTOMIZATION] Hide preview, copy, share in simple mode */}
           {/* TODO: Figure out why combined isnt working - works in storybook */}
-          <ButtonGroup combined containerProps={{ className: "border-default hidden lg:flex" }}>
-            {!isManagedEventType && (
-              <>
-                {/* We have to warp this in tooltip as it has a href which disables the tooltip on buttons */}
-                {!isPlatform && (
-                  <Tooltip content={t("preview")} side="bottom" sideOffset={4}>
+          {!isSimpleMode && (
+            <ButtonGroup combined containerProps={{ className: "border-default hidden lg:flex" }}>
+              {!isManagedEventType && (
+                <>
+                  {/* We have to warp this in tooltip as it has a href which disables the tooltip on buttons */}
+                  {!isPlatform && (
+                    <Tooltip content={t("preview")} side="bottom" sideOffset={4}>
+                      <Button
+                        color="secondary"
+                        data-testid="preview-button"
+                        target="_blank"
+                        variant="icon"
+                        href={permalink}
+                        rel="noreferrer"
+                        StartIcon="external-link"
+                      />
+                    </Tooltip>
+                  )}
+
+                  {!isPlatform && (
                     <Button
                       color="secondary"
-                      data-testid="preview-button"
-                      target="_blank"
                       variant="icon"
-                      href={permalink}
-                      rel="noreferrer"
-                      StartIcon="external-link"
+                      StartIcon="link"
+                      tooltip={t("copy_link")}
+                      tooltipSide="bottom"
+                      tooltipOffset={4}
+                      onClick={() => {
+                        navigator.clipboard.writeText(permalink);
+                        showToast("Link copied!", "success");
+                      }}
                     />
-                  </Tooltip>
-                )}
+                  )}
+                  {!isPlatform && (
+                    <EventTypeEmbedButton
+                      embedUrl={encodeURIComponent(embedLink)}
+                      StartIcon="code"
+                      color="secondary"
+                      variant="icon"
+                      namespace={eventType.slug}
+                      tooltip={t("embed")}
+                      tooltipSide="bottom"
+                      tooltipOffset={4}
+                      eventId={formMethods.getValues("id")}
+                    />
+                  )}
+                </>
+              )}
+              {!isChildrenManagedEventType && allowDelete && (
+                <Button
+                  color="destructive"
+                  variant="icon"
+                  StartIcon="trash"
+                  tooltip={t("delete")}
+                  tooltipSide="bottom"
+                  tooltipOffset={4}
+                  disabled={!hasPermsToDelete}
+                  onClick={() => setDeleteDialogOpen(true)}
+                />
+              )}
+            </ButtonGroup>
+          )}
+          {/* [DISCUNO CUSTOMIZATION] End */}
 
-                {!isPlatform && (
-                  <Button
-                    color="secondary"
-                    variant="icon"
-                    StartIcon="link"
-                    tooltip={t("copy_link")}
-                    tooltipSide="bottom"
-                    tooltipOffset={4}
-                    onClick={() => {
-                      navigator.clipboard.writeText(permalink);
-                      showToast("Link copied!", "success");
-                    }}
-                  />
-                )}
-                {!isPlatform && (
-                  <EventTypeEmbedButton
-                    embedUrl={encodeURIComponent(embedLink)}
-                    StartIcon="code"
-                    color="secondary"
-                    variant="icon"
-                    namespace={eventType.slug}
-                    tooltip={t("embed")}
-                    tooltipSide="bottom"
-                    tooltipOffset={4}
-                    eventId={formMethods.getValues("id")}
-                  />
-                )}
-              </>
-            )}
-            {!isChildrenManagedEventType && allowDelete && (
-              <Button
-                color="destructive"
-                variant="icon"
-                StartIcon="trash"
-                tooltip={t("delete")}
-                tooltipSide="bottom"
-                tooltipOffset={4}
-                disabled={!hasPermsToDelete}
-                onClick={() => setDeleteDialogOpen(true)}
-              />
-            )}
-          </ButtonGroup>
+          {/* [DISCUNO CUSTOMIZATION] Hide divider in simple mode */}
+          {(!isPlatform || (isPlatform && allowDelete)) && !isSimpleMode && (
+            <VerticalDivider className="hidden lg:block" />
+          )}
+          {/* [DISCUNO CUSTOMIZATION] End */}
 
-          {(!isPlatform || (isPlatform && allowDelete)) && <VerticalDivider className="hidden lg:block" />}
-
-          <Dropdown>
-            <DropdownMenuTrigger asChild>
-              <Button className="lg:hidden" StartIcon="ellipsis" variant="icon" color="secondary" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent style={{ minWidth: "200px" }}>
-              <DropdownMenuItem className="focus:ring-muted">
-                <DropdownItem
-                  target="_blank"
-                  type="button"
-                  StartIcon="external-link"
-                  href={permalink}
-                  rel="noreferrer">
-                  {t("preview")}
-                </DropdownItem>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="focus:ring-muted">
-                <DropdownItem
-                  type="button"
-                  StartIcon="link"
-                  onClick={() => {
-                    navigator.clipboard.writeText(permalink);
-                    showToast("Link copied!", "success");
-                  }}>
-                  {t("copy_link")}
-                </DropdownItem>
-              </DropdownMenuItem>
-              {allowDelete && (
+          {/* [DISCUNO CUSTOMIZATION] Hide mobile dropdown in simple mode */}
+          {!isSimpleMode && (
+            <Dropdown>
+              <DropdownMenuTrigger asChild>
+                <Button className="lg:hidden" StartIcon="ellipsis" variant="icon" color="secondary" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent style={{ minWidth: "200px" }}>
+                <DropdownMenuItem className="focus:ring-muted">
+                  <DropdownItem
+                    target="_blank"
+                    type="button"
+                    StartIcon="external-link"
+                    href={permalink}
+                    rel="noreferrer">
+                    {t("preview")}
+                  </DropdownItem>
+                </DropdownMenuItem>
                 <DropdownMenuItem className="focus:ring-muted">
                   <DropdownItem
                     type="button"
-                    color="destructive"
-                    StartIcon="trash"
-                    disabled={!hasPermsToDelete}
-                    onClick={() => setDeleteDialogOpen(true)}>
-                    {t("delete")}
+                    StartIcon="link"
+                    onClick={() => {
+                      navigator.clipboard.writeText(permalink);
+                      showToast("Link copied!", "success");
+                    }}>
+                    {t("copy_link")}
                   </DropdownItem>
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <div className="hover:bg-subtle flex h-9 cursor-pointer flex-row items-center justify-between px-4 py-2 transition">
-                <Skeleton
-                  as={Label}
-                  htmlFor="hiddenSwitch"
-                  className="mt-2 inline cursor-pointer self-center pr-2 ">
-                  {formMethods.watch("hidden") ? t("show_eventtype_on_profile") : t("hide_from_profile")}
-                </Skeleton>
-                <Switch
-                  id="hiddenSwitch"
-                  checked={!formMethods.watch("hidden")}
-                  onCheckedChange={(e) => {
-                    formMethods.setValue("hidden", !e, { shouldDirty: true });
-                  }}
-                />
-              </div>
-            </DropdownMenuContent>
-          </Dropdown>
+                {allowDelete && (
+                  <DropdownMenuItem className="focus:ring-muted">
+                    <DropdownItem
+                      type="button"
+                      color="destructive"
+                      StartIcon="trash"
+                      disabled={!hasPermsToDelete}
+                      onClick={() => setDeleteDialogOpen(true)}>
+                      {t("delete")}
+                    </DropdownItem>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <div className="hover:bg-subtle flex h-9 cursor-pointer flex-row items-center justify-between px-4 py-2 transition">
+                  <Skeleton
+                    as={Label}
+                    htmlFor="hiddenSwitch"
+                    className="mt-2 inline cursor-pointer self-center pr-2 ">
+                    {formMethods.watch("hidden") ? t("show_eventtype_on_profile") : t("hide_from_profile")}
+                  </Skeleton>
+                  <Switch
+                    id="hiddenSwitch"
+                    checked={!formMethods.watch("hidden")}
+                    onCheckedChange={(e) => {
+                      formMethods.setValue("hidden", !e, { shouldDirty: true });
+                    }}
+                  />
+                </div>
+              </DropdownMenuContent>
+            </Dropdown>
+          )}
+          {/* [DISCUNO CUSTOMIZATION] End */}
           <div className="border-default border-l-2" />
           <Button
             className="ml-4 lg:ml-0"
