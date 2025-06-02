@@ -932,6 +932,12 @@ type Props = {
 };
 
 export const EventTypesCTA = ({ userEventGroupsData }: Omit<Props, "user">) => {
+  // [DISCUNO CUSTOMIZATION] Hiding the create button
+  const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+  console.log("isSimpleMode", isSimpleMode);
+  if (isSimpleMode) return null;
+  // [DISCUNO CUSTOMIZATION] End
+
   const profileOptions =
     userEventGroupsData?.profiles
       ?.filter((profile) => !profile.readOnly)

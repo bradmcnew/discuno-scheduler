@@ -15,6 +15,7 @@ const safeGet = async <T = any>(key: string): Promise<T | undefined> => {
   }
 };
 
+// [DISCUNO CUSTOMIZATION] Blocking paths
 // https://mentor.discuno.com/*
 const BLOCKED_PATHS = [
   // Pages
@@ -65,12 +66,16 @@ const BLOCKED_PATHS = [
   "/api/trpc/ooo",
   "/api/trpc/calVideo",
   "/api/trpc/availability/team",
+  "/api/trpc/eventTypes/create",
+  "/api/trpc/eventTypes/delete",
+  "/api/trpc/eventTypes/duplicate",
+  "/api/trpc/eventTypes/getEventTypesFromGroup",
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
 const BLOCKED_TABS = ["workflows", "webhooks", "recurring", "limits", "advanced"];
 
-const BLOCKED_DIALOG = ["new", "embed"];
+const BLOCKED_DIALOG = ["new", "embed", "duplicate"];
 
 const checkSimplemode = (req: NextRequest): NextResponse | null => {
   const isSimpleMode = process.env.SIMPLE_MODE === "true";
@@ -117,6 +122,7 @@ const checkSimplemode = (req: NextRequest): NextResponse | null => {
 
   return null;
 };
+// [DISCUNO CUSTOMIZATION] End
 
 export const POST_METHODS_ALLOWED_API_ROUTES = ["/api/auth/signup", "/api/trpc/"];
 export function checkPostMethod(req: NextRequest) {
@@ -142,10 +148,11 @@ export function checkStaticFiles(pathname: string) {
 }
 
 const middleware = async (req: NextRequest): Promise<NextResponse<unknown>> => {
-  // Route blocking middleware
+  // [DISCUNO CUSTOMIZATION] Route blocking middleware
   const simpleModeBlocked = checkSimplemode(req);
   if (simpleModeBlocked) return simpleModeBlocked;
-  //--------------------------------------
+  // [DISCUNO CUSTOMIZATION] End
+
   const postCheckResult = checkPostMethod(req);
   if (postCheckResult) return postCheckResult;
 
@@ -325,6 +332,10 @@ export const config = {
     "/api/trpc/ooo/:path*",
     "/api/trpc/calVideo/:path*",
     "/api/trpc/availability/team/:path*",
+    "/api/trpc/eventTypes/create/:path*",
+    "/api/trpc/eventTypes/delete/:path*",
+    "/api/trpc/eventTypes/duplicate/:path*",
+    "api/trpc/eventTypes/getEventTypesFromGroup/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",

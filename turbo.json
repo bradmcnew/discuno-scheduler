@@ -58,7 +58,8 @@
         "BUILD_STANDALONE",
         "NEXT_PUBLIC_API_HITPAY_PRODUCTION",
         "NEXT_PUBLIC_API_HITPAY_SANDBOX",
-        "SIMPLE_MODE"
+        "SIMPLE_MODE",
+        "NEXT_PUBLIC_SIMPLE_MODE"
       ]
     },
     "@calcom/web#dx": {
