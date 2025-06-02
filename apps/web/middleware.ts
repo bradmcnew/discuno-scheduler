@@ -69,7 +69,6 @@ const BLOCKED_PATHS = [
   "/api/trpc/eventTypes/create",
   "/api/trpc/eventTypes/delete",
   "/api/trpc/eventTypes/duplicate",
-  "/api/trpc/eventTypes/getEventTypesFromGroup",
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
@@ -335,7 +334,6 @@ export const config = {
     "/api/trpc/eventTypes/create/:path*",
     "/api/trpc/eventTypes/delete/:path*",
     "/api/trpc/eventTypes/duplicate/:path*",
-    "api/trpc/eventTypes/getEventTypesFromGroup/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",

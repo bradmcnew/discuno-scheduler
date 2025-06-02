@@ -87,6 +87,10 @@ const querySchema = z.object({
   teamId: z.nullable(z.coerce.number()).optional().default(null),
 });
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 const InfiniteTeamsTab: FC<InfiniteTeamsTabProps> = (props) => {
   const { activeEventTypeGroup } = props;
   const { t } = useLocale();
@@ -116,18 +120,22 @@ const InfiniteTeamsTab: FC<InfiniteTeamsTabProps> = (props) => {
 
   return (
     <div>
-      <TextField
-        className="max-w-64"
-        addOnLeading={<Icon name="search" className="text-subtle h-4 w-4" />}
-        containerClassName="max-w-64 focus:!ring-offset-0 mb-4"
-        type="search"
-        value={searchTerm}
-        autoComplete="false"
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-        }}
-        placeholder={t("search")}
-      />
+      {/* [DISCUNO CUSTOMIZATION] Hide search bar in simple mode */}
+      {!isSimpleMode && (
+        <TextField
+          className="max-w-64"
+          addOnLeading={<Icon name="search" className="text-subtle h-4 w-4" />}
+          containerClassName="max-w-64 focus:!ring-offset-0 mb-4"
+          type="search"
+          value={searchTerm}
+          autoComplete="false"
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+          placeholder={t("search")}
+        />
+      )}
+      {/* [DISCUNO CUSTOMIZATION] End */}
       {!!activeEventTypeGroup && (
         <InfiniteEventTypeList
           pages={query?.data?.pages}
@@ -933,8 +941,6 @@ type Props = {
 
 export const EventTypesCTA = ({ userEventGroupsData }: Omit<Props, "user">) => {
   // [DISCUNO CUSTOMIZATION] Hiding the create button
-  const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-  console.log("isSimpleMode", isSimpleMode);
   if (isSimpleMode) return null;
   // [DISCUNO CUSTOMIZATION] End
 
