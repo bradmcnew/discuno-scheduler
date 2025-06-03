@@ -40,6 +40,10 @@ import { cn } from "../src/lib/utils";
 import { Timezone as PlatformTimzoneSelect } from "../timezone/index";
 import type { AvailabilityFormValues } from "./types";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 export type Schedule = {
   id: number;
   startTime: Date;
@@ -353,7 +357,8 @@ export function AvailabilitySettings({
       CTA={
         <div className={cn(customClassNames?.ctaClassName, "flex items-center justify-end")}>
           <div className="sm:hover:bg-muted hidden items-center rounded-md px-2 transition sm:flex">
-            {!openSidebar && allowSetToDefault ? (
+            {/* [DISCUNO CUSTOMIZATION] Hide set to default in simple mode */}
+            {!openSidebar && allowSetToDefault && !isSimpleMode ? (
               <>
                 <Skeleton
                   as={Label}
@@ -385,6 +390,7 @@ export function AvailabilitySettings({
                 <VerticalDivider className="hidden sm:inline" />
               </>
             ) : null}
+            {/* [DISCUNO CUSTOMIZATION] End */}
           </div>
 
           {bulkUpdateModalProps && bulkUpdateModalProps?.isOpen && (
@@ -400,7 +406,8 @@ export function AvailabilitySettings({
             />
           )}
 
-          {allowDelete && (
+          {/* [DISCUNO CUSTOMIZATION] Hide delete button in simple mode */}
+          {allowDelete && !isSimpleMode && (
             <>
               <DeleteDialogButton
                 buttonClassName={cn("hidden me-2 sm:inline", customClassNames?.deleteButtonClassname)}
@@ -411,6 +418,7 @@ export function AvailabilitySettings({
               <VerticalDivider className="hidden sm:inline" />
             </>
           )}
+          {/* [DISCUNO CUSTOMIZATION] End */}
           <SmallScreenSideBar open={openSidebar}>
             <>
               <div
@@ -427,7 +435,8 @@ export function AvailabilitySettings({
                   <div className="flex flex-row items-center pt-16">
                     <Button StartIcon="arrow-left" color="minimal" onClick={() => setOpenSidebar(false)} />
                     <p className="-ml-2">{t("availability_settings")}</p>
-                    {allowDelete && (
+                    {/* [DISCUNO CUSTOMIZATION] Hide delete button in simple mode */}
+                    {allowDelete && !isSimpleMode && (
                       <DeleteDialogButton
                         buttonClassName={cn("ml-16 inline", customClassNames?.deleteButtonClassname)}
                         disabled={schedule.isLastSchedule}
@@ -438,6 +447,7 @@ export function AvailabilitySettings({
                         }}
                       />
                     )}
+                    {/* [DISCUNO CUSTOMIZATION] End */}
                   </div>
                   <div className="flex flex-col px-2 py-2">
                     <Skeleton as={Label} waitForTranslation={!isPlatform}>
@@ -455,7 +465,8 @@ export function AvailabilitySettings({
                     />
                   </div>
                   <div className="flex h-9 flex-row-reverse items-center justify-end gap-3 px-2">
-                    {allowSetToDefault && (
+                    {/* [DISCUNO CUSTOMIZATION] Hide set to default in simple mode */}
+                    {allowSetToDefault && !isSimpleMode && (
                       <>
                         <Skeleton
                           as={Label}
@@ -482,6 +493,7 @@ export function AvailabilitySettings({
                         />
                       </>
                     )}
+                    {/* [DISCUNO CUSTOMIZATION] End */}
                   </div>
 
                   <div className="min-w-40 col-span-3 space-y-2 px-2 py-4 lg:col-span-1">
@@ -514,7 +526,8 @@ export function AvailabilitySettings({
                           }
                         />
                       </div>
-                      {!isPlatform && (
+                      {/* [DISCUNO CUSTOMIZATION] Hide troubleshoot in simple mode */}
+                      {!isPlatform && !isSimpleMode && (
                         <>
                           <hr className="border-subtle my-7" />
                           <div className="rounded-md md:block">
@@ -631,7 +644,7 @@ export function AvailabilitySettings({
               </div>
               {isPlatform ? (
                 <></>
-              ) : (
+              ) : !isSimpleMode ? (
                 <>
                   <hr className="border-subtle my-6 mr-8" />
                   <div className="rounded-md">
@@ -652,7 +665,7 @@ export function AvailabilitySettings({
                     </div>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         </Form>
