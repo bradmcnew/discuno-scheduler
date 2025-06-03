@@ -300,6 +300,8 @@ export const config = {
     "/settings/developer/:path*",
     "/settings/teams/:path*",
     "/settings/my-account/out-of-office/:path*",
+    "/bookings/unconfirmed/:path*",
+    "/bookings/recurring/:path*",
 
     // Simple mode blocked paths - API routes
     "/api/video/recording/:path*",

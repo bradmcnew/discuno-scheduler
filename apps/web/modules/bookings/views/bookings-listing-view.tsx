@@ -162,18 +162,24 @@ function BookingsContent({ status }: BookingsProps) {
           },
         },
       }),
-      columnHelper.accessor((row) => row.type === "data" && row.booking.eventType.team?.id, {
-        id: "teamId",
-        header: t("team"),
-        enableColumnFilter: true,
-        enableSorting: false,
-        cell: () => null,
-        meta: {
-          filter: {
-            type: ColumnFilterType.MULTI_SELECT,
-          },
-        },
-      }),
+      // [DISCUNO CUSTOMIZATION] Hide team column in simple mode
+      ...(!isSimpleMode
+        ? [
+            columnHelper.accessor((row) => row.type === "data" && row.booking.eventType.team?.id, {
+              id: "teamId",
+              header: t("team"),
+              enableColumnFilter: true,
+              enableSorting: false,
+              cell: () => null,
+              meta: {
+                filter: {
+                  type: ColumnFilterType.MULTI_SELECT,
+                },
+              },
+            }),
+          ]
+        : []),
+      // [DISCUNO CUSTOMIZATION] End
       columnHelper.accessor((row) => row.type === "data" && row.booking.user?.id, {
         id: "userId",
         header: t("member"),
