@@ -18,6 +18,10 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { eventTypeMetaDataSchemaWithTypedApps } from "@calcom/prisma/zod-utils";
 import type { VerticalTabItemProps } from "@calcom/ui/components/navigation";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type Props = {
   formMethods: UseFormReturn<FormValues>;
   eventType: EventTypeSetupProps["eventType"];
@@ -81,7 +85,9 @@ export const useTabsNavigations = ({
       availability,
     });
 
-    if (!requirePayment) {
+    // [DISCUNO CUSTOMIZATION] Hide recurring tab in simple mode
+    if (!isSimpleMode && !requirePayment) {
+      // [DISCUNO CUSTOMIZATION] End
       navigation.splice(3, 0, {
         name: t("recurring"),
         href: `/event-types/${formMethods.getValues("id")}?tabName=recurring`,
@@ -132,15 +138,19 @@ export const useTabsNavigations = ({
         });
       }
     }
-    navigation.push({
-      name: t("webhooks"),
-      href: `/event-types/${formMethods.getValues("id")}?tabName=webhooks`,
-      icon: "webhook",
-      info: `${activeWebhooksNumber} ${t("active")}`,
-      "data-testid": "webhooks",
-    });
+    // [DISCUNO CUSTOMIZATION] Hide webhooks tab in simple mode
+    if (!isSimpleMode) {
+      navigation.push({
+        name: t("webhooks"),
+        href: `/event-types/${formMethods.getValues("id")}?tabName=webhooks`,
+        icon: "webhook",
+        info: `${activeWebhooksNumber} ${t("active")}`,
+        "data-testid": "webhooks",
+      });
+    }
+    // [DISCUNO CUSTOMIZATION] End
     const hidden = true; // hidden while in alpha trial. you can access it with tabName=ai
-    if (team && hidden) {
+    if (!isSimpleMode && team && hidden) {
       navigation.push({
         name: "Cal.ai",
         href: `/event-types/${eventType.id}?tabName=ai`,
@@ -193,6 +203,27 @@ function getNavigation({
 }: getNavigationProps) {
   const duration = multipleDuration?.map((duration) => ` ${duration}`) || length;
 
+  // [DISCUNO CUSTOMIZATION] Hide limits tab in simple mode
+  if (isSimpleMode) {
+    return [
+      {
+        name: t("event_setup_tab_title"),
+        href: `/event-types/${id}?tabName=setup`,
+        icon: "link",
+        info: `${duration} ${t("minute_timeUnit")}`, // TODO: Get this from props
+        "data-testid": `event_setup_tab_title`,
+      },
+      {
+        name: t("apps"),
+        href: `/event-types/${id}?tabName=apps`,
+        icon: "grid-3x3",
+        //TODO: Handle proper translation with count handling
+        info: `${installedAppsNumber} apps, ${enabledAppsNumber} ${t("active")}`,
+        "data-testid": "apps",
+      },
+    ] satisfies VerticalTabItemProps[];
+  }
+  // [DISCUNO CUSTOMIZATION] End
   return [
     {
       name: t("event_setup_tab_title"),
