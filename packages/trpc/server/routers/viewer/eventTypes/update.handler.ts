@@ -32,6 +32,71 @@ import {
   handlePeriodType,
 } from "./util";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+const BLOCKED_FIELDS = [
+  "minimumBookingNotice",
+  "slotInterval",
+  "afterEventBuffer",
+  "beforeEventBuffer",
+  "bookingLimits",
+  "onlyShowFirstAvailableSlot",
+  "periodDays",
+  "periodType",
+  "durationLimits",
+  "destinationCalendar",
+  "eventName",
+  "useEventTypeDestinationCalendarEmail",
+  "useEventLevelSelectedCalendars",
+  "bookingFields",
+  "requiresConfirmation", // make always false
+  "disableCancelling", // make always true
+  "disableRescheduling", // make always true
+  "canSendCalVideoTranscriptionEmails", // make always false
+  "requiresBookerEmailVerification",
+  "hideCalendarNotes",
+  "hideCalendarEventDetails",
+  "successRedirectUrl",
+  "forwardParamsSuccessRedirect",
+  "multiplePrivateLinks",
+  "seatsPerTimeSlot",
+  "hideOrganizerEmail",
+  "lockTimeZoneToggleOnBookingPage",
+  "allowReschedulingPastBookings",
+  "customReplyToEmail",
+  "eventTypeColor",
+  "recurringEvent",
+  "interfaceLanguage",
+  "slug",
+  "metadata",
+  "calVideoSettings",
+  "locations",
+];
+
+const validateSimpleModeRestrictions = (input: TUpdateInputSchema) => {
+  if (!isSimpleMode) return;
+  // Check for blocked fields in input
+  const blockedFieldsPresent = BLOCKED_FIELDS.filter((field) => {
+    const fieldValue = input[field as keyof TUpdateInputSchema];
+    if (field === "multiplePrivateLinks") {
+      return (
+        fieldValue !== undefined &&
+        fieldValue !== null &&
+        (!Array.isArray(fieldValue) || fieldValue.length > 0)
+      );
+    }
+    return fieldValue !== undefined && fieldValue !== null;
+  });
+
+  if (blockedFieldsPresent.length > 0) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Some fields are not allowed in simple mode.",
+    });
+  }
+};
+// [DISCUNO CUSTOMIZATION] End
+
 type SessionUser = NonNullable<TrpcSessionUser>;
 type User = {
   id: SessionUser["id"];
@@ -57,6 +122,10 @@ type UpdateOptions = {
 export type UpdateEventTypeReturn = Awaited<ReturnType<typeof updateHandler>>;
 
 export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
+  // [DISCUNO CUSTOMIZATION] Validate simple mode restrictions
+  validateSimpleModeRestrictions(input);
+  // [DISCUNO CUSTOMIZATION] End
+
   const {
     schedule,
     instantMeetingSchedule,
