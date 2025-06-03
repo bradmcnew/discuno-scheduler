@@ -471,6 +471,15 @@ async function handler(
   const bookingSeat = reqBody.rescheduleUid ? await getSeatedBooking(reqBody.rescheduleUid) : null;
   const rescheduleUid = bookingSeat ? bookingSeat.booking.uid : reqBody.rescheduleUid;
 
+  // [DISCUNO CUSTOMIZATION] Block all rescheduling
+  if (rescheduleUid) {
+    throw new HttpError({
+      statusCode: 400,
+      message: "Rescheduling is not available",
+    });
+  }
+  // [DISCUNO CUSTOMIZATION] End
+
   let originalRescheduledBooking = rescheduleUid
     ? await getOriginalRescheduledBooking(rescheduleUid, !!eventType.seatsPerTimeSlot)
     : null;
