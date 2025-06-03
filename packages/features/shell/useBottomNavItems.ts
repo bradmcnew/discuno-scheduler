@@ -8,6 +8,10 @@ import { showToast } from "@calcom/ui/components/toast";
 
 import { type NavigationItemType } from "./navigation/NavigationItem";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type BottomNavItemsProps = {
   publicPageUrl: string;
   isAdmin: boolean;
@@ -47,22 +51,26 @@ export function useBottomNavItems({
           },
         }
       : null,
-    {
-      name: "view_public_page",
-      href: publicPageUrl,
-      icon: "external-link",
-      target: "__blank",
-    },
-    {
-      name: "copy_public_page_link",
-      href: "",
-      onClick: (e: { preventDefault: () => void }) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(publicPageUrl);
-        showToast(t("link_copied"), "success");
-      },
-      icon: "copy",
-    },
+    // [DISCUNO CUSTOMIZATION] Conditionally include view public page, copy public page link, based on simple mode
+    !isSimpleMode
+      ? ({
+          name: "view_public_page",
+          href: publicPageUrl,
+          icon: "external-link",
+          target: "__blank",
+        },
+        {
+          name: "copy_public_page_link",
+          href: "",
+          onClick: (e: { preventDefault: () => void }) => {
+            e.preventDefault();
+            navigator.clipboard.writeText(publicPageUrl);
+            showToast(t("link_copied"), "success");
+          },
+          icon: "copy",
+        })
+      : null,
+    // [DISCUNO CUSTOMIZATION] End
     IS_DUB_REFERRALS_ENABLED
       ? {
           name: "referral_text",
