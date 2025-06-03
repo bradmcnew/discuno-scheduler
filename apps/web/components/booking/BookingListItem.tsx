@@ -54,6 +54,10 @@ import { ReassignDialog } from "@components/dialog/ReassignDialog";
 import { RerouteDialog } from "@components/dialog/RerouteDialog";
 import { RescheduleDialog } from "@components/dialog/RescheduleDialog";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type BookingListingStatus = RouterInputs["viewer"]["bookings"]["get"]["filters"]["status"];
 
 type BookingItem = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][number];
@@ -341,11 +345,17 @@ function BookingListItem(booking: BookingItemProps) {
       `,
       icon: "x" as const,
     },
-    {
-      id: "edit_booking",
-      label: t("edit"),
-      actions: editBookingActions,
-    },
+    // [DISCUNO CUSTOMIZATION] Hide edit dropdown in simple mode
+    ...(!isSimpleMode
+      ? [
+          {
+            id: "edit_booking",
+            label: t("edit"),
+            actions: editBookingActions,
+          },
+        ]
+      : []),
+    // [DISCUNO CUSTOMIZATION] End
   ];
 
   const chargeCardActions: ActionType[] = [
