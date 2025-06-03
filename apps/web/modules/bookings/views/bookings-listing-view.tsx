@@ -34,6 +34,10 @@ import SkeletonLoader from "@components/booking/SkeletonLoader";
 import { useFacetedUniqueValues } from "~/bookings/hooks/useFacetedUniqueValues";
 import type { validStatuses } from "~/bookings/lib/validStatuses";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type BookingListingStatus = (typeof validStatuses)[number];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 
@@ -50,16 +54,22 @@ const tabs: (VerticalTabItemProps | HorizontalTabItemProps)[] = [
     href: "/bookings/upcoming",
     "data-testid": "upcoming",
   },
-  {
-    name: "unconfirmed",
-    href: "/bookings/unconfirmed",
-    "data-testid": "unconfirmed",
-  },
-  {
-    name: "recurring",
-    href: "/bookings/recurring",
-    "data-testid": "recurring",
-  },
+  // [DISCUNO CUSTOMIZATION] Hide unconfirmed and recurring tabs in simple mode
+  ...(!isSimpleMode
+    ? [
+        {
+          name: "unconfirmed",
+          href: "/bookings/unconfirmed",
+          "data-testid": "unconfirmed",
+        },
+        {
+          name: "recurring",
+          href: "/bookings/recurring",
+          "data-testid": "recurring",
+        },
+      ]
+    : []),
+  // [DISCUNO CUSTOMIZATION] End
   {
     name: "past",
     href: "/bookings/past",
