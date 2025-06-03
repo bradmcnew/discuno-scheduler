@@ -16,6 +16,10 @@ import { NavigationItem, MobileNavigationItem, MobileNavigationMoreItem } from "
 
 export const MORE_SEPARATOR_NAME = "more";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 const getNavigationItems = (orgBranding: OrganizationBranding): NavigationItemType[] => [
   {
     name: "event_types_page_title",
@@ -87,13 +91,19 @@ const getNavigationItems = (orgBranding: OrganizationBranding): NavigationItemTy
     href: "/more",
     icon: "ellipsis",
   },
-  {
-    name: "routing",
-    href: "/routing",
-    icon: "split",
-    isCurrent: ({ pathname }) => pathname?.startsWith("/routing") ?? false,
-    moreOnMobile: true,
-  },
+  // [DISCUNO CUSTOMIZATION] Conditionally include routing based on simple mode
+  ...(isSimpleMode
+    ? []
+    : [
+        {
+          name: "routing",
+          href: "/routing",
+          icon: "split",
+          isCurrent: ({ pathname }) => pathname?.startsWith("/routing") ?? false,
+          moreOnMobile: true,
+        },
+      ]),
+  // [DISCUNO CUSTOMIZATION] End
   {
     name: "workflows",
     href: "/workflows",
