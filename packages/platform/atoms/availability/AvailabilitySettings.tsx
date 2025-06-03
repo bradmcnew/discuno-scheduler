@@ -644,7 +644,7 @@ export function AvailabilitySettings({
               </div>
               {isPlatform ? (
                 <></>
-              ) : !isSimpleMode ? (
+              ) : (
                 <>
                   <hr className="border-subtle my-6 mr-8" />
                   <div className="rounded-md">
@@ -665,7 +665,7 @@ export function AvailabilitySettings({
                     </div>
                   </div>
                 </>
-              ) : null}
+              )}
             </div>
           </div>
         </Form>

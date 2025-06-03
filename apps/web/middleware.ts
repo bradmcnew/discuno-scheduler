@@ -75,6 +75,7 @@ const BLOCKED_PATHS = [
   "/api/trpc/bookings/editLocation",
   "/api/trpc/bookings/requestReschedule",
   "/api/trpc/availability/schedule.create",
+  "/availability/troubleshoot",
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
@@ -306,6 +307,7 @@ export const config = {
     "/settings/my-account/out-of-office/:path*",
     "/bookings/unconfirmed/:path*",
     "/bookings/recurring/:path*",
+    "/availability/troubleshoot/:path*",
 
     // Simple mode blocked paths - API routes
     "/api/video/recording/:path*",
