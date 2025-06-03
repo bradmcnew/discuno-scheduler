@@ -52,24 +52,26 @@ export function useBottomNavItems({
         }
       : null,
     // [DISCUNO CUSTOMIZATION] Conditionally include view public page, copy public page link, based on simple mode
-    !isSimpleMode
-      ? ({
-          name: "view_public_page",
-          href: publicPageUrl,
-          icon: "external-link",
-          target: "__blank",
-        },
-        {
-          name: "copy_public_page_link",
-          href: "",
-          onClick: (e: { preventDefault: () => void }) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(publicPageUrl);
-            showToast(t("link_copied"), "success");
+    ...(!isSimpleMode
+      ? [
+          {
+            name: "view_public_page",
+            href: publicPageUrl,
+            icon: "external-link",
+            target: "__blank",
           },
-          icon: "copy",
-        })
-      : null,
+          {
+            name: "copy_public_page_link",
+            href: "",
+            onClick: (e: { preventDefault: () => void }) => {
+              e.preventDefault();
+              navigator.clipboard.writeText(publicPageUrl);
+              showToast(t("link_copied"), "success");
+            },
+            icon: "copy",
+          },
+        ]
+      : []),
     // [DISCUNO CUSTOMIZATION] End
     IS_DUB_REFERRALS_ENABLED
       ? {
