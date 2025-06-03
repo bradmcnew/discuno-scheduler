@@ -71,6 +71,9 @@ const BLOCKED_PATHS = [
   "/api/trpc/eventTypes/create",
   "/api/trpc/eventTypes/delete",
   "/api/trpc/eventTypes/duplicate",
+  "/api/trpc/bookings/addGuests",
+  "/api/trpc/bookings/editLocation",
+  "/api/trpc/bookings/requestReschedule",
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
@@ -336,6 +339,9 @@ export const config = {
     "/api/trpc/calVideo/:path*",
     "/api/trpc/availability/team/:path*",
     "/api/trpc/eventTypes/:path*",
+    "/api/trpc/bookings/addGuests/:path*",
+    "/api/trpc/bookings/editLocation/:path*",
+    "/api/trpc/bookings/requestReschedule/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",
