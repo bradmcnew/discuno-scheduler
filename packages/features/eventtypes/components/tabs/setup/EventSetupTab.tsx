@@ -27,6 +27,10 @@ import { Select } from "@calcom/ui/components/form";
 import { SettingsToggle } from "@calcom/ui/components/form";
 import { Skeleton } from "@calcom/ui/components/skeleton";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 export type EventSetupTabCustomClassNames = {
   wrapper?: string;
   titleSection?: {
@@ -159,7 +163,8 @@ export const EventSetupTab = (
               </>
             )}
           </div>
-          {!isPlatform && (
+          {/* [DISCUNO CUSTOMIZATION] Hide translate description toggle in simple mode */}
+          {!isSimpleMode && !isPlatform && (
             <div className="[&_label]:my-1 [&_label]:font-normal">
               <SettingsToggle
                 title={t("translate_description_button")}
@@ -172,7 +177,7 @@ export const EventSetupTab = (
               />
             </div>
           )}
-          {!isPlatform && interfaceLanguageOptions.length > 0 && (
+          {!isSimpleMode && !isPlatform && interfaceLanguageOptions.length > 0 && (
             <div>
               <Skeleton
                 as={Label}
@@ -200,32 +205,34 @@ export const EventSetupTab = (
               />
             </div>
           )}
-          <TextField
-            required
-            label={isPlatform ? "Slug" : t("URL")}
-            {...(isManagedEventType || isChildrenManagedEventType ? urlLockedProps : {})}
-            defaultValue={eventType.slug}
-            data-testid="event-slug"
-            containerClassName={classNames(customClassNames?.titleSection?.urlInput?.container)}
-            labelClassName={classNames(customClassNames?.titleSection?.urlInput?.label)}
-            className={classNames(customClassNames?.titleSection?.urlInput?.input)}
-            addOnLeading={
-              isPlatform ? undefined : (
-                <>
-                  {urlPrefix}/
-                  {!isManagedEventType
-                    ? team
-                      ? (hasOrgBranding ? "" : "team/") + team.slug
-                      : formMethods.getValues("users")[0].username
-                    : t("username_placeholder")}
-                  /
-                </>
-              )
-            }
-            {...formMethods.register("slug", {
-              setValueAs: (v) => slugify(v),
-            })}
-          />
+          {!isSimpleMode && (
+            <TextField
+              required
+              label={isPlatform ? "Slug" : t("URL")}
+              {...(isManagedEventType || isChildrenManagedEventType ? urlLockedProps : {})}
+              defaultValue={eventType.slug}
+              data-testid="event-slug"
+              containerClassName={classNames(customClassNames?.titleSection?.urlInput?.container)}
+              labelClassName={classNames(customClassNames?.titleSection?.urlInput?.label)}
+              className={classNames(customClassNames?.titleSection?.urlInput?.input)}
+              addOnLeading={
+                isPlatform ? undefined : (
+                  <>
+                    {urlPrefix}/
+                    {!isManagedEventType
+                      ? team
+                        ? (hasOrgBranding ? "" : "team/") + team.slug
+                        : formMethods.getValues("users")[0].username
+                      : t("username_placeholder")}
+                    /
+                  </>
+                )
+              }
+              {...formMethods.register("slug", {
+                setValueAs: (v) => slugify(v),
+              })}
+            />
+          )}
         </div>
         <div
           className={classNames(
