@@ -22,6 +22,10 @@ import { useGetUserAttributes } from "@calcom/web/components/settings/platform/h
 
 import FreshChatProvider from "../../ee/support/lib/freshchat/FreshChatProvider";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] END
+
 declare global {
   interface Window {
     Plain?: {
@@ -144,25 +148,33 @@ export function UserDropdown({ small }: UserDropdownProps) {
                       {t("my_settings")}
                     </DropdownItem>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <DropdownItem
-                      type="button"
-                      CustomStartIcon={
-                        <Icon name="moon" className="text-default h-4 w-4" aria-hidden="true" />
-                      }
-                      href="/settings/my-account/out-of-office">
-                      {t("out_of_office")}
-                    </DropdownItem>
-                  </DropdownMenuItem>
+                  {/* [DISCUNO CUSTOMIZATION] Conditionally include out of office based on simple mode */}
+                  {!isSimpleMode && (
+                    <DropdownMenuItem>
+                      <DropdownItem
+                        type="button"
+                        CustomStartIcon={
+                          <Icon name="moon" className="text-default h-4 w-4" aria-hidden="true" />
+                        }
+                        href="/settings/my-account/out-of-office">
+                        {t("out_of_office")}
+                      </DropdownItem>
+                    </DropdownMenuItem>
+                  )}
+                  {/* [DISCUNO CUSTOMIZATION] End */}
                   <DropdownMenuSeparator />
                 </>
               )}
 
-              <DropdownMenuItem>
-                <DropdownItem StartIcon="map" target="_blank" href={ROADMAP}>
-                  {t("visit_roadmap")}
-                </DropdownItem>
-              </DropdownMenuItem>
+              {/* [DISCUNO CUSTOMIZATION] Conditionally include roadmap based on simple mode */}
+              {!isSimpleMode && (
+                <DropdownMenuItem>
+                  <DropdownItem StartIcon="map" target="_blank" href={ROADMAP}>
+                    {t("visit_roadmap")}
+                  </DropdownItem>
+                </DropdownMenuItem>
+              )}
+              {/* [DISCUNO CUSTOMIZATION] End */}
               <DropdownMenuItem>
                 <DropdownItem
                   type="button"
@@ -172,14 +184,15 @@ export function UserDropdown({ small }: UserDropdownProps) {
                   {t("help")}
                 </DropdownItem>
               </DropdownMenuItem>
-              {!isPlatformPages && (
+              {/* [DISCUNO CUSTOMIZATION] Conditionally include download desktop app based on simple mode */}
+              {!isSimpleMode && !isPlatformPages && (
                 <DropdownMenuItem className="todesktop:hidden hidden lg:flex">
                   <DropdownItem StartIcon="download" target="_blank" rel="noreferrer" href={DESKTOP_APP_LINK}>
                     {t("download_desktop_app")}
                   </DropdownItem>
                 </DropdownMenuItem>
               )}
-
+              {/* [DISCUNO CUSTOMIZATION] End */}
               {!isPlatformPages && isPlatformUser && (
                 <DropdownMenuItem className="todesktop:hidden hidden lg:flex">
                   <DropdownItem StartIcon="blocks" target="_blank" rel="noreferrer" href="/settings/platform">
