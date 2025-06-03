@@ -47,6 +47,8 @@ const BLOCKED_PATHS = [
   "/api/email",
   "/auth/oidc",
   "/auth/saml",
+  "/bookings/unconfirmed",
+  "/bookings/recurring",
   // tRPC paths (corrected)
   "/api/trpc/teams",
   "/api/trpc/organizations",
@@ -72,7 +74,7 @@ const BLOCKED_PATHS = [
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
-const BLOCKED_TABS = ["workflows", "webhooks", "recurring", "limits", "advanced"];
+const BLOCKED_EVENT_TABS = ["workflows", "webhooks", "recurring", "limits", "advanced"];
 
 const BLOCKED_DIALOG = ["new", "embed", "duplicate"];
 
@@ -99,7 +101,7 @@ const checkSimplemode = (req: NextRequest): NextResponse | null => {
   // Check if event type tab is blocked
   if (pathname.startsWith("/event-types/")) {
     const tabName = searchParams.get("tabName");
-    if (tabName && BLOCKED_TABS.includes(tabName)) {
+    if (tabName && BLOCKED_EVENT_TABS.includes(tabName)) {
       return new NextResponse(null, { status: 404, statusText: "Not Found" });
     }
   }
