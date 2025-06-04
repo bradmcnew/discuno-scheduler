@@ -31,7 +31,17 @@ const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
 // [DISCUNO CUSTOMIZATION] End
 
 // [DISCUNO CUSTOMIZATION] Blocked fields in simple mode
-const BLOCKED_FIELDS = ["receiveMonthlyDigestEmail", "allowSEOIndexing", "allowDynamicBooking", "username"];
+const BLOCKED_FIELDS = [
+  "receiveMonthlyDigestEmail",
+  "allowSEOIndexing",
+  "allowDynamicBooking",
+  "username",
+  "theme",
+  "metadata",
+  "brandColor",
+  "darkBrandColor",
+  "hideBranding",
+];
 // [DISCUNO CUSTOMIZATION] End
 
 const validateInput = (input: TUpdateProfileInputSchema) => {
