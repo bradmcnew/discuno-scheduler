@@ -27,6 +27,10 @@ import type { VerticalTabItemProps } from "@calcom/ui/components/navigation";
 import { VerticalTabItem } from "@calcom/ui/components/navigation";
 import { Skeleton } from "@calcom/ui/components/skeleton";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 const getTabs = (orgBranding: OrganizationBranding | null) => {
   const tabs: VerticalTabItemProps[] = [
     {
@@ -39,7 +43,9 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
         { name: "calendars", href: "/settings/my-account/calendars" },
         { name: "conferencing", href: "/settings/my-account/conferencing" },
         { name: "appearance", href: "/settings/my-account/appearance" },
-        { name: "out_of_office", href: "/settings/my-account/out-of-office" },
+        // [DISCUNO CUSTOMIZATION] Hide out of office in simple mode
+        ...(isSimpleMode ? [] : [{ name: "out_of_office", href: "/settings/my-account/out-of-office" }]),
+        // [DISCUNO CUSTOMIZATION] End
         { name: "push_notifications", href: "/settings/my-account/push-notifications" },
         // TODO
         // { name: "referrals", href: "/settings/my-account/referrals" },
