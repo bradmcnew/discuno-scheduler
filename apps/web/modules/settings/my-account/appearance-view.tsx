@@ -27,6 +27,10 @@ import { SkeletonButton, SkeletonContainer, SkeletonText } from "@calcom/ui/comp
 import { showToast } from "@calcom/ui/components/toast";
 import { useCalcomTheme } from "@calcom/ui/styles";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 const SkeletonLoader = () => {
   return (
     <SkeletonContainer>
@@ -229,180 +233,186 @@ const AppearanceView = ({
           </Button>
         </SectionBottomActions>
       </Form>
-
-      {isApartOfOrganization ? null : (
+      {/* [DISCUNO CUSTOMIZATION] Hide theme settings in simple mode */}
+      {!isSimpleMode && (
         <>
-          <div className="border-subtle mt-6 flex items-center rounded-t-lg border p-6 text-sm">
-            <div>
-              <p className="text-default text-base font-semibold">{t("theme")}</p>
-              <p className="text-default">{t("theme_applies_note")}</p>
-            </div>
-          </div>
-          <Form
-            form={userThemeFormMethods}
-            handleSubmit={({ theme }) => {
-              if (theme === "light" || theme === "dark") {
-                mutation.mutate({
-                  theme,
-                });
-                return;
-              }
-              mutation.mutate({
-                theme: null,
-              });
-            }}>
-            <div className="border-subtle flex flex-col justify-between border-x px-6 py-8 sm:flex-row">
-              <ThemeLabel
-                variant="system"
-                value="system"
-                label={t("theme_system")}
-                defaultChecked={user.theme === null}
-                register={userThemeFormMethods.register}
-              />
-              <ThemeLabel
-                variant="light"
-                value="light"
-                label={t("light")}
-                defaultChecked={user.theme === "light"}
-                register={userThemeFormMethods.register}
-              />
-              <ThemeLabel
-                variant="dark"
-                value="dark"
-                label={t("dark")}
-                defaultChecked={user.theme === "dark"}
-                register={userThemeFormMethods.register}
-              />
-            </div>
-            <SectionBottomActions className="mb-6" align="end">
-              <Button
-                loading={mutation.isPending}
-                disabled={isUserThemeSubmitting || !isUserThemeDirty}
-                type="submit"
-                data-testid="update-theme-btn"
-                color="primary">
-                {t("update")}
-              </Button>
-            </SectionBottomActions>
-          </Form>
-
-          <Form
-            form={bookerLayoutFormMethods}
-            handleSubmit={(values) => {
-              const layoutError = validateBookerLayouts(values?.metadata?.defaultBookerLayouts || null);
-              if (layoutError) {
-                showToast(t(layoutError), "error");
-                return;
-              } else {
-                mutation.mutate(values);
-              }
-            }}>
-            <BookerLayoutSelector
-              isDark={selectedThemeIsDark}
-              name="metadata.defaultBookerLayouts"
-              title={t("bookerlayout_user_settings_title")}
-              description={t("bookerlayout_user_settings_description")}
-              isDisabled={isBookerLayoutFormSubmitting || !isBookerLayoutFormDirty}
-              isLoading={mutation.isPending}
-              user={user}
-            />
-          </Form>
-
-          <Form
-            form={brandColorsFormMethods}
-            handleSubmit={(values) => {
-              mutation.mutate(values);
-            }}>
-            <div className="mt-6">
-              <SettingsToggle
-                toggleSwitchAtTheEnd={true}
-                title={t("custom_brand_colors")}
-                description={t("customize_your_brand_colors")}
-                checked={isCustomBrandColorChecked}
-                onCheckedChange={(checked) => {
-                  setIsCustomBranColorChecked(checked);
-                  if (!checked) {
+          {isApartOfOrganization ? null : (
+            <>
+              <div className="border-subtle mt-6 flex items-center rounded-t-lg border p-6 text-sm">
+                <div>
+                  <p className="text-default text-base font-semibold">{t("theme")}</p>
+                  <p className="text-default">{t("theme_applies_note")}</p>
+                </div>
+              </div>
+              <Form
+                form={userThemeFormMethods}
+                handleSubmit={({ theme }) => {
+                  if (theme === "light" || theme === "dark") {
                     mutation.mutate({
-                      brandColor: DEFAULT_LIGHT_BRAND_COLOR,
-                      darkBrandColor: DEFAULT_DARK_BRAND_COLOR,
+                      theme,
                     });
+                    return;
                   }
-                }}
-                childrenClassName="lg:ml-0">
-                <div className="border-subtle flex flex-col gap-6 border-x p-6">
-                  <Controller
-                    name="brandColor"
-                    control={brandColorsFormMethods.control}
-                    defaultValue={DEFAULT_BRAND_COLOURS.light}
-                    render={() => (
-                      <div>
-                        <p className="text-default mb-2 block text-sm font-medium">
-                          {t("light_brand_color")}
-                        </p>
-                        <ColorPicker
-                          defaultValue={DEFAULT_BRAND_COLOURS.light}
-                          resetDefaultValue={DEFAULT_LIGHT_BRAND_COLOR}
-                          onChange={(value) => {
-                            if (checkWCAGContrastColor("#ffffff", value)) {
-                              setLightModeError(false);
-                            } else {
-                              setLightModeError(true);
-                            }
-                            brandColorsFormMethods.setValue("brandColor", value, { shouldDirty: true });
-                          }}
-                        />
-                        {lightModeError ? (
-                          <div className="mt-4">
-                            <Alert severity="warning" message={t("light_theme_contrast_error")} />
-                          </div>
-                        ) : null}
-                      </div>
-                    )}
+                  mutation.mutate({
+                    theme: null,
+                  });
+                }}>
+                <div className="border-subtle flex flex-col justify-between border-x px-6 py-8 sm:flex-row">
+                  <ThemeLabel
+                    variant="system"
+                    value="system"
+                    label={t("theme_system")}
+                    defaultChecked={user.theme === null}
+                    register={userThemeFormMethods.register}
                   />
-
-                  <Controller
-                    name="darkBrandColor"
-                    control={brandColorsFormMethods.control}
-                    defaultValue={DEFAULT_BRAND_COLOURS.dark}
-                    render={() => (
-                      <div className="mt-6 sm:mt-0">
-                        <p className="text-default mb-2 block text-sm font-medium">{t("dark_brand_color")}</p>
-                        <ColorPicker
-                          defaultValue={DEFAULT_BRAND_COLOURS.dark}
-                          resetDefaultValue={DEFAULT_DARK_BRAND_COLOR}
-                          onChange={(value) => {
-                            if (checkWCAGContrastColor("#101010", value)) {
-                              setDarkModeError(false);
-                            } else {
-                              setDarkModeError(true);
-                            }
-                            brandColorsFormMethods.setValue("darkBrandColor", value, { shouldDirty: true });
-                          }}
-                        />
-                        {darkModeError ? (
-                          <div className="mt-4">
-                            <Alert severity="warning" message={t("dark_theme_contrast_error")} />
-                          </div>
-                        ) : null}
-                      </div>
-                    )}
+                  <ThemeLabel
+                    variant="light"
+                    value="light"
+                    label={t("light")}
+                    defaultChecked={user.theme === "light"}
+                    register={userThemeFormMethods.register}
+                  />
+                  <ThemeLabel
+                    variant="dark"
+                    value="dark"
+                    label={t("dark")}
+                    defaultChecked={user.theme === "dark"}
+                    register={userThemeFormMethods.register}
                   />
                 </div>
-                <SectionBottomActions align="end">
+                <SectionBottomActions className="mb-6" align="end">
                   <Button
                     loading={mutation.isPending}
-                    disabled={isBrandColorsFormSubmitting || !isBrandColorsFormDirty}
-                    color="primary"
-                    type="submit">
+                    disabled={isUserThemeSubmitting || !isUserThemeDirty}
+                    type="submit"
+                    data-testid="update-theme-btn"
+                    color="primary">
                     {t("update")}
                   </Button>
                 </SectionBottomActions>
-              </SettingsToggle>
-            </div>
-          </Form>
+              </Form>
 
-          {/* TODO future PR to preview brandColors */}
-          {/* <Button
+              <Form
+                form={bookerLayoutFormMethods}
+                handleSubmit={(values) => {
+                  const layoutError = validateBookerLayouts(values?.metadata?.defaultBookerLayouts || null);
+                  if (layoutError) {
+                    showToast(t(layoutError), "error");
+                    return;
+                  } else {
+                    mutation.mutate(values);
+                  }
+                }}>
+                <BookerLayoutSelector
+                  isDark={selectedThemeIsDark}
+                  name="metadata.defaultBookerLayouts"
+                  title={t("bookerlayout_user_settings_title")}
+                  description={t("bookerlayout_user_settings_description")}
+                  isDisabled={isBookerLayoutFormSubmitting || !isBookerLayoutFormDirty}
+                  isLoading={mutation.isPending}
+                  user={user}
+                />
+              </Form>
+
+              <Form
+                form={brandColorsFormMethods}
+                handleSubmit={(values) => {
+                  mutation.mutate(values);
+                }}>
+                <div className="mt-6">
+                  <SettingsToggle
+                    toggleSwitchAtTheEnd={true}
+                    title={t("custom_brand_colors")}
+                    description={t("customize_your_brand_colors")}
+                    checked={isCustomBrandColorChecked}
+                    onCheckedChange={(checked) => {
+                      setIsCustomBranColorChecked(checked);
+                      if (!checked) {
+                        mutation.mutate({
+                          brandColor: DEFAULT_LIGHT_BRAND_COLOR,
+                          darkBrandColor: DEFAULT_DARK_BRAND_COLOR,
+                        });
+                      }
+                    }}
+                    childrenClassName="lg:ml-0">
+                    <div className="border-subtle flex flex-col gap-6 border-x p-6">
+                      <Controller
+                        name="brandColor"
+                        control={brandColorsFormMethods.control}
+                        defaultValue={DEFAULT_BRAND_COLOURS.light}
+                        render={() => (
+                          <div>
+                            <p className="text-default mb-2 block text-sm font-medium">
+                              {t("light_brand_color")}
+                            </p>
+                            <ColorPicker
+                              defaultValue={DEFAULT_BRAND_COLOURS.light}
+                              resetDefaultValue={DEFAULT_LIGHT_BRAND_COLOR}
+                              onChange={(value) => {
+                                if (checkWCAGContrastColor("#ffffff", value)) {
+                                  setLightModeError(false);
+                                } else {
+                                  setLightModeError(true);
+                                }
+                                brandColorsFormMethods.setValue("brandColor", value, { shouldDirty: true });
+                              }}
+                            />
+                            {lightModeError ? (
+                              <div className="mt-4">
+                                <Alert severity="warning" message={t("light_theme_contrast_error")} />
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+                      />
+
+                      <Controller
+                        name="darkBrandColor"
+                        control={brandColorsFormMethods.control}
+                        defaultValue={DEFAULT_BRAND_COLOURS.dark}
+                        render={() => (
+                          <div className="mt-6 sm:mt-0">
+                            <p className="text-default mb-2 block text-sm font-medium">
+                              {t("dark_brand_color")}
+                            </p>
+                            <ColorPicker
+                              defaultValue={DEFAULT_BRAND_COLOURS.dark}
+                              resetDefaultValue={DEFAULT_DARK_BRAND_COLOR}
+                              onChange={(value) => {
+                                if (checkWCAGContrastColor("#101010", value)) {
+                                  setDarkModeError(false);
+                                } else {
+                                  setDarkModeError(true);
+                                }
+                                brandColorsFormMethods.setValue("darkBrandColor", value, {
+                                  shouldDirty: true,
+                                });
+                              }}
+                            />
+                            {darkModeError ? (
+                              <div className="mt-4">
+                                <Alert severity="warning" message={t("dark_theme_contrast_error")} />
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+                      />
+                    </div>
+                    <SectionBottomActions align="end">
+                      <Button
+                        loading={mutation.isPending}
+                        disabled={isBrandColorsFormSubmitting || !isBrandColorsFormDirty}
+                        color="primary"
+                        type="submit">
+                        {t("update")}
+                      </Button>
+                    </SectionBottomActions>
+                  </SettingsToggle>
+                </div>
+              </Form>
+
+              {/* TODO future PR to preview brandColors */}
+              {/* <Button
         color="secondary"
         EndIcon="external-link"
         className="mt-6"
@@ -410,21 +420,24 @@ const AppearanceView = ({
         Preview
       </Button> */}
 
-          <SettingsToggle
-            toggleSwitchAtTheEnd={true}
-            title={t("disable_cal_branding", { appName: APP_NAME })}
-            disabled={!hasPaidPlan || mutation?.isPending}
-            description={t("removes_cal_branding", { appName: APP_NAME })}
-            checked={hasPaidPlan ? hideBrandingValue : false}
-            Badge={<UpgradeTeamsBadge />}
-            onCheckedChange={(checked) => {
-              setHideBrandingValue(checked);
-              mutation.mutate({ hideBranding: checked });
-            }}
-            switchContainerClassName="mt-6"
-          />
+              <SettingsToggle
+                toggleSwitchAtTheEnd={true}
+                title={t("disable_cal_branding", { appName: APP_NAME })}
+                disabled={!hasPaidPlan || mutation?.isPending}
+                description={t("removes_cal_branding", { appName: APP_NAME })}
+                checked={hasPaidPlan ? hideBrandingValue : false}
+                Badge={<UpgradeTeamsBadge />}
+                onCheckedChange={(checked) => {
+                  setHideBrandingValue(checked);
+                  mutation.mutate({ hideBranding: checked });
+                }}
+                switchContainerClassName="mt-6"
+              />
+            </>
+          )}
         </>
       )}
+      {/* [DISCUNO CUSTOMIZATION] End */}
     </div>
   );
 };
