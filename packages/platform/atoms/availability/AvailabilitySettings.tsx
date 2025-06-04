@@ -642,7 +642,7 @@ export function AvailabilitySettings({
                   }
                 />
               </div>
-              {isPlatform ? (
+              {isPlatform || isSimpleMode ? (
                 <></>
               ) : (
                 <>

@@ -19,6 +19,10 @@ import { EmptyScreen } from "@calcom/ui/components/empty-screen";
 import { ToggleGroup } from "@calcom/ui/components/form";
 import { showToast } from "@calcom/ui/components/toast";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 type AvailabilityListProps = {
   me: RouterOutputs["viewer"]["me"]["get"];
   availabilities: RouterOutputs["viewer"]["availability"]["list"];
@@ -151,16 +155,20 @@ export function AvailabilityList({ availabilities, me }: AvailabilityListProps) 
                   updateDefault={updateMutation.mutate}
                   deleteFunction={deleteMutation.mutate}
                   duplicateFunction={duplicateMutation.mutate}
+                  hideDropdown={isSimpleMode}
                 />
               ))}
             </ul>
           </div>
-          <div className="text-default mb-16 mt-4 hidden text-center text-sm md:block">
-            {t("temporarily_out_of_office")}{" "}
-            <Link href="settings/my-account/out-of-office" className="underline">
-              {t("add_a_redirect")}
-            </Link>
-          </div>
+          {/* [DISCUNO CUSTOMIZATION] Hide temporarily out of office footer in simple mode */}
+          {!isSimpleMode && (
+            <div className="text-default mb-16 mt-4 hidden text-center text-sm md:block">
+              {t("temporarily_out_of_office")}{" "}
+              <Link href="settings/my-account/out-of-office" className="underline">
+                {t("add_a_redirect")}
+              </Link>
+            </div>
+          )}
           {bulkUpdateModal && (
             <BulkEditDefaultForEventsModal
               isPending={bulkUpdateDefaultAvailabilityMutation.isPending}
@@ -204,16 +212,22 @@ export const AvailabilityCTA = ({ toggleGroupOptions }: AvailabilityCTAProps) =>
 
   return (
     <div className="flex items-center gap-2">
-      <ToggleGroup
-        className="hidden h-fit md:block"
-        defaultValue={searchParams?.get("type") ?? "mine"}
-        onValueChange={(value) => {
-          if (!value) return;
-          router.push(`${pathname}?${createQueryString("type", value)}`);
-        }}
-        options={toggleGroupOptions}
-      />
-      <NewScheduleButton />
+      {/* [DISCUNO CUSTOMIZATION] Hide my/team availability tabs in simple mode */}
+      {!isSimpleMode && (
+        <ToggleGroup
+          className="hidden h-fit md:block"
+          defaultValue={searchParams?.get("type") ?? "mine"}
+          onValueChange={(value) => {
+            if (!value) return;
+            router.push(`${pathname}?${createQueryString("type", value)}`);
+          }}
+          options={toggleGroupOptions}
+        />
+      )}
+      {/* [DISCUNO CUSTOMIZATION] End */}
+      {/* [DISCUNO CUSTOMIZATION] Hide +New button in simple mode */}
+      {!isSimpleMode && <NewScheduleButton />}
+      {/* [DISCUNO CUSTOMIZATION] End */}
     </div>
   );
 };
