@@ -304,17 +304,21 @@ const ProfileView = () => {
           setShowCreateAccountPasswordDialog(true);
         }}
         extraField={
-          <div className="mt-6">
-            <UsernameAvailabilityField
-              onSuccessMutation={async () => {
-                showToast(t("settings_updated_successfully"), "success");
-                await utils.viewer.me.invalidate();
-              }}
-              onErrorMutation={() => {
-                showToast(t("error_updating_settings"), "error");
-              }}
-            />
-          </div>
+          // [DISCUNO CUSTOMIZATION] Hide username availability field in simple mode
+          !isSimpleMode && (
+            <div className="mt-6">
+              <UsernameAvailabilityField
+                onSuccessMutation={async () => {
+                  showToast(t("settings_updated_successfully"), "success");
+                  await utils.viewer.me.invalidate();
+                }}
+                onErrorMutation={() => {
+                  showToast(t("error_updating_settings"), "error");
+                }}
+              />
+            </div>
+          )
+          // [DISCUNO CUSTOMIZATION] End
         }
         isCALIdentityProvider={isCALIdentityProvider}
       />
@@ -661,9 +665,13 @@ const ProfileForm = ({
           />
         </div>
         {extraField}
-        <p className="text-subtle mt-1 flex items-center gap-1 text-sm">
-          <Icon name="info" /> {t("tip_username_plus")}
-        </p>
+        {/* [DISCUNO CUSTOMIZATION] Hide username tip in simple mode */}
+        {!isSimpleMode && (
+          <p className="text-subtle mt-1 flex items-center gap-1 text-sm">
+            <Icon name="info" /> {t("tip_username_plus")}
+          </p>
+        )}
+        {/* [DISCUNO CUSTOMIZATION] End */}
         <div className="mt-6">
           <TextField label={t("full_name")} {...formMethods.register("name")} />
         </div>
