@@ -15,6 +15,23 @@ const safeGet = async <T = any>(key: string): Promise<T | undefined> => {
   }
 };
 
+// [DISCUNO CUSTOMIZATION] Check if user is admin
+/* TODO: Uncomment when ready to test
+const isAdmin = async (req: NextRequest): Promise<boolean> => {
+  try {
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    return !!token && token.role === "ADMIN";
+  } catch {
+    return false;
+  }
+};
+*/
+// [DISCUNO CUSTOMIZATION] End
+
 // [DISCUNO CUSTOMIZATION] Blocking paths
 // https://mentor.discuno.com/*
 const BLOCKED_PATHS = [
@@ -75,6 +92,8 @@ const BLOCKED_PATHS = [
   "/api/trpc/bookings/editLocation",
   "/api/trpc/bookings/requestReschedule",
   "/api/trpc/availability/schedule.create",
+  "/api/trpc/availability/schedule.duplicate",
+  "/api/trpc/availability/schedule.delete",
   "/availability/troubleshoot",
 ];
 
@@ -346,6 +365,8 @@ export const config = {
     "/api/trpc/bookings/editLocation/:path*",
     "/api/trpc/bookings/requestReschedule/:path*",
     "/api/trpc/availability/schedule.create/:path*",
+    "/api/trpc/availability/schedule.duplicate/:path*",
+    "/api/trpc/availability/schedule.delete/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",
