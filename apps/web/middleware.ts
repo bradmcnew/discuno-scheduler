@@ -54,6 +54,9 @@ const BLOCKED_PATHS = [
   "/settings/developer/webhooks",
   "/settings/developer/api-keys",
   "/settings/teams/new",
+  "/bookings/unconfirmed",
+  "/bookings/recurring",
+  "/availability/troubleshoot",
   // API paths
   "/api/video/recording",
   "/api/version",
@@ -64,8 +67,6 @@ const BLOCKED_PATHS = [
   "/api/email",
   "/auth/oidc",
   "/auth/saml",
-  "/bookings/unconfirmed",
-  "/bookings/recurring",
   // tRPC paths (corrected)
   "/api/trpc/teams",
   "/api/trpc/organizations",
@@ -94,7 +95,7 @@ const BLOCKED_PATHS = [
   "/api/trpc/availability/schedule.create",
   "/api/trpc/availability/schedule.duplicate",
   "/api/trpc/availability/schedule.delete",
-  "/availability/troubleshoot",
+  "/api/trpc/me/deleteMe",
 ];
 
 // https://mentor.discuno.com/event-types/##?tabName=*
@@ -367,6 +368,7 @@ export const config = {
     "/api/trpc/availability/schedule.create/:path*",
     "/api/trpc/availability/schedule.duplicate/:path*",
     "/api/trpc/availability/schedule.delete/:path*",
+    "/api/trpc/me/deleteMe/:path*",
 
     // Event types with query parameters
     "/event-types/:path*",
