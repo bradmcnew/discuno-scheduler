@@ -50,6 +50,10 @@ import { UsernameAvailabilityField } from "@components/ui/UsernameAvailability";
 
 import type { TRPCClientErrorLike } from "@trpc/client";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 const SkeletonLoader = () => {
   return (
     <SkeletonContainer>
@@ -315,60 +319,65 @@ const ProfileView = () => {
         isCALIdentityProvider={isCALIdentityProvider}
       />
 
-      <div className="border-subtle mt-6 rounded-lg rounded-b-none border border-b-0 p-6">
-        <Label className="mb-0 text-base font-semibold text-red-700">{t("danger_zone")}</Label>
-        <p className="text-subtle text-sm">{t("account_deletion_cannot_be_undone")}</p>
-      </div>
-      {/* Delete account Dialog */}
-      <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
-        <SectionBottomActions align="end">
-          <DialogTrigger asChild>
-            <Button data-testid="delete-account" color="destructive" className="mt-1" StartIcon="trash-2">
-              {t("delete_account")}
-            </Button>
-          </DialogTrigger>
-        </SectionBottomActions>
-        <DialogContent
-          title={t("delete_account_modal_title")}
-          description={t("confirm_delete_account_modal", { appName: APP_NAME })}
-          type="creation"
-          Icon="triangle-alert">
-          <>
-            <div className="mb-10">
-              <p className="text-subtle mb-4 text-sm">{t("delete_account_confirmation_message")}</p>
-              {isCALIdentityProvider && (
-                <PasswordField
-                  data-testid="password"
-                  name="password"
-                  id="password"
-                  autoComplete="current-password"
-                  required
-                  label="Password"
-                  ref={passwordRef}
-                />
-              )}
+      {/* [DISCUNO CUSTOMIZATION] Hide delete account zone in simple mode */}
+      {!isSimpleMode && (
+        <>
+          <div className="border-subtle mt-6 rounded-lg rounded-b-none border border-b-0 p-6">
+            <Label className="mb-0 text-base font-semibold text-red-700">{t("danger_zone")}</Label>
+            <p className="text-subtle text-sm">{t("account_deletion_cannot_be_undone")}</p>
+          </div>
+          {/* Delete account Dialog */}
+          <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
+            <SectionBottomActions align="end">
+              <DialogTrigger asChild>
+                <Button data-testid="delete-account" color="destructive" className="mt-1" StartIcon="trash-2">
+                  {t("delete_account")}
+                </Button>
+              </DialogTrigger>
+            </SectionBottomActions>
+            <DialogContent
+              title={t("delete_account_modal_title")}
+              description={t("confirm_delete_account_modal", { appName: APP_NAME })}
+              type="creation"
+              Icon="triangle-alert">
+              <>
+                <div className="mb-10">
+                  <p className="text-subtle mb-4 text-sm">{t("delete_account_confirmation_message")}</p>
+                  {isCALIdentityProvider && (
+                    <PasswordField
+                      data-testid="password"
+                      name="password"
+                      id="password"
+                      autoComplete="current-password"
+                      required
+                      label="Password"
+                      ref={passwordRef}
+                    />
+                  )}
 
-              {user?.twoFactorEnabled && isCALIdentityProvider && (
-                <Form handleSubmit={onConfirm} className="pb-4" form={form}>
-                  <TwoFactor center={false} />
-                </Form>
-              )}
+                  {user?.twoFactorEnabled && isCALIdentityProvider && (
+                    <Form handleSubmit={onConfirm} className="pb-4" form={form}>
+                      <TwoFactor center={false} />
+                    </Form>
+                  )}
 
-              {hasDeleteErrors && <Alert severity="error" title={deleteErrorMessage} />}
-            </div>
-            <DialogFooter showDivider>
-              <DialogClose />
-              <Button
-                color="primary"
-                data-testid="delete-account-confirm"
-                onClick={(e) => onConfirmButton(e)}
-                loading={deleteMeMutation.isPending}>
-                {t("delete_my_account")}
-              </Button>
-            </DialogFooter>
-          </>
-        </DialogContent>
-      </Dialog>
+                  {hasDeleteErrors && <Alert severity="error" title={deleteErrorMessage} />}
+                </div>
+                <DialogFooter showDivider>
+                  <DialogClose />
+                  <Button
+                    color="primary"
+                    data-testid="delete-account-confirm"
+                    onClick={(e) => onConfirmButton(e)}
+                    loading={deleteMeMutation.isPending}>
+                    {t("delete_my_account")}
+                  </Button>
+                </DialogFooter>
+              </>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
 
       {/* If changing email, confirm password */}
       <Dialog open={confirmPasswordOpen} onOpenChange={setConfirmPasswordOpen}>
