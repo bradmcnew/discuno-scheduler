@@ -23,6 +23,10 @@ import { showToast } from "@calcom/ui/components/toast";
 
 import TravelScheduleModal from "@components/settings/TravelScheduleModal";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
 export type FormValues = {
   locale: {
     value: string;
@@ -350,51 +354,57 @@ const GeneralView = ({ localeProp, user, travelSchedules, revalidatePage }: Gene
         </SectionBottomActions>
       </Form>
 
-      <SettingsToggle
-        toggleSwitchAtTheEnd={true}
-        title={t("dynamic_booking")}
-        description={t("allow_dynamic_booking")}
-        disabled={mutation.isPending}
-        checked={isAllowDynamicBookingChecked}
-        onCheckedChange={(checked) => {
-          setIsAllowDynamicBookingChecked(checked);
-          mutation.mutate({ allowDynamicBooking: checked });
-        }}
-        switchContainerClassName="mt-6"
-      />
+      {/* [DISCUNO CUSTOMIZATION] Hide settings toggles in simple mode */}
+      {!isSimpleMode && (
+        <>
+          <SettingsToggle
+            toggleSwitchAtTheEnd={true}
+            title={t("dynamic_booking")}
+            description={t("allow_dynamic_booking")}
+            disabled={mutation.isPending}
+            checked={isAllowDynamicBookingChecked}
+            onCheckedChange={(checked) => {
+              setIsAllowDynamicBookingChecked(checked);
+              mutation.mutate({ allowDynamicBooking: checked });
+            }}
+            switchContainerClassName="mt-6"
+          />
 
-      <SettingsToggle
-        data-testid="my-seo-indexing-switch"
-        toggleSwitchAtTheEnd={true}
-        title={t("seo_indexing")}
-        description={t("allow_seo_indexing")}
-        disabled={mutation.isPending || user.organizationSettings?.allowSEOIndexing === false}
-        checked={isAllowSEOIndexingChecked}
-        onCheckedChange={(checked) => {
-          setIsAllowSEOIndexingChecked(checked);
-          mutation.mutate({ allowSEOIndexing: checked });
-        }}
-        switchContainerClassName="mt-6"
-      />
+          <SettingsToggle
+            data-testid="my-seo-indexing-switch"
+            toggleSwitchAtTheEnd={true}
+            title={t("seo_indexing")}
+            description={t("allow_seo_indexing")}
+            disabled={mutation.isPending || user.organizationSettings?.allowSEOIndexing === false}
+            checked={isAllowSEOIndexingChecked}
+            onCheckedChange={(checked) => {
+              setIsAllowSEOIndexingChecked(checked);
+              mutation.mutate({ allowSEOIndexing: checked });
+            }}
+            switchContainerClassName="mt-6"
+          />
 
-      <SettingsToggle
-        toggleSwitchAtTheEnd={true}
-        title={t("monthly_digest_email")}
-        description={t("monthly_digest_email_for_teams")}
-        disabled={mutation.isPending}
-        checked={isReceiveMonthlyDigestEmailChecked}
-        onCheckedChange={(checked) => {
-          setIsReceiveMonthlyDigestEmailChecked(checked);
-          mutation.mutate({ receiveMonthlyDigestEmail: checked });
-        }}
-        switchContainerClassName="mt-6"
-      />
-      <TravelScheduleModal
-        open={isTZScheduleOpen}
-        onOpenChange={() => setIsTZScheduleOpen(false)}
-        setValue={formMethods.setValue}
-        existingSchedules={formMethods.getValues("travelSchedules") ?? []}
-      />
+          <SettingsToggle
+            toggleSwitchAtTheEnd={true}
+            title={t("monthly_digest_email")}
+            description={t("monthly_digest_email_for_teams")}
+            disabled={mutation.isPending}
+            checked={isReceiveMonthlyDigestEmailChecked}
+            onCheckedChange={(checked) => {
+              setIsReceiveMonthlyDigestEmailChecked(checked);
+              mutation.mutate({ receiveMonthlyDigestEmail: checked });
+            }}
+            switchContainerClassName="mt-6"
+          />
+          <TravelScheduleModal
+            open={isTZScheduleOpen}
+            onOpenChange={() => setIsTZScheduleOpen(false)}
+            setValue={formMethods.setValue}
+            existingSchedules={formMethods.getValues("travelSchedules") ?? []}
+          />
+        </>
+      )}
+      {/* [DISCUNO CUSTOMIZATION] End */}
     </div>
   );
 };

@@ -26,6 +26,30 @@ import { TRPCError } from "@trpc/server";
 import { getDefaultScheduleId } from "../availability/util";
 import { updateUserMetadataAllowedKeys, type TUpdateProfileInputSchema } from "./updateProfile.schema";
 
+// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
+// [DISCUNO CUSTOMIZATION] End
+
+// [DISCUNO CUSTOMIZATION] Blocked fields in simple mode
+const BLOCKED_FIELDS = ["receiveMonthlyDigestEmail", "allowSEOIndexing", "allowDynamicBooking"];
+// [DISCUNO CUSTOMIZATION] End
+
+const validateInput = (input: TUpdateProfileInputSchema) => {
+  if (isSimpleMode) {
+    const blockedFieldsPresent = BLOCKED_FIELDS.filter((field) => {
+      const fieldValue = input[field as keyof TUpdateProfileInputSchema];
+      return fieldValue !== undefined && fieldValue !== null;
+    });
+
+    if (blockedFieldsPresent.length > 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Some fields are not allowed in simple mode",
+      });
+    }
+  }
+};
+
 const log = logger.getSubLogger({ prefix: ["updateProfile"] });
 type UpdateProfileOptions = {
   ctx: {
@@ -36,6 +60,10 @@ type UpdateProfileOptions = {
 };
 
 export const updateProfileHandler = async ({ ctx, input }: UpdateProfileOptions) => {
+  // [DISCUNO CUSTOMIZATION] Validate input in simple mode
+  validateInput(input);
+  // [DISCUNO CUSTOMIZATION] End
+
   const { user } = ctx;
   const billingService = new StripeBillingService();
   const userMetadata = handleUserMetadata({ ctx, input });
