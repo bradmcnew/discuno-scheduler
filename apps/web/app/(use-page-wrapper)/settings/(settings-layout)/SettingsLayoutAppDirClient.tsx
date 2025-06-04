@@ -63,25 +63,31 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
         { name: "2fa_auth", href: "/settings/security/two-factor-auth" },
       ],
     },
-    {
-      name: "billing",
-      href: "/settings/billing",
-      icon: "credit-card",
-      children: [{ name: "manage_billing", href: "/settings/billing" }],
-    },
-    {
-      name: "developer",
-      href: "/settings/developer",
-      icon: "terminal",
-      children: [
-        //
-        { name: "webhooks", href: "/settings/developer/webhooks" },
-        { name: "api_keys", href: "/settings/developer/api-keys" },
-        { name: "admin_api", href: "/settings/organizations/admin-api" },
-        // TODO: Add profile level for embeds
-        // { name: "embeds", href: "/v2/settings/developer/embeds" },
-      ],
-    },
+    // [DISCUNO CUSTOMIZATION] Hide billing in simple mode
+    ...(isSimpleMode
+      ? []
+      : [
+          {
+            name: "billing",
+            href: "/settings/billing",
+            icon: "credit-card",
+            children: [{ name: "manage_billing", href: "/settings/billing" }],
+          },
+          {
+            name: "developer",
+            href: "/settings/developer",
+            icon: "terminal",
+            children: [
+              //
+              { name: "webhooks", href: "/settings/developer/webhooks" },
+              { name: "api_keys", href: "/settings/developer/api-keys" },
+              { name: "admin_api", href: "/settings/organizations/admin-api" },
+              // TODO: Add profile level for embeds
+              // { name: "embeds", href: "/v2/settings/developer/embeds" },
+            ],
+          },
+        ]),
+    // [DISCUNO CUSTOMIZATION] End
     {
       name: "organization",
       href: "/settings/organizations",
@@ -125,12 +131,18 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
         },
       ],
     },
-    {
-      name: "teams",
-      href: "/teams",
-      icon: "users",
-      children: [],
-    },
+    // [DISCUNO CUSTOMIZATION] Hide teams in simple mode
+    ...(isSimpleMode
+      ? []
+      : [
+          {
+            name: "teams",
+            href: "/teams",
+            icon: "users",
+            children: [],
+          },
+        ]),
+    // [DISCUNO CUSTOMIZATION] End
     {
       name: "other_teams",
       href: "/settings/organizations/teams/other",

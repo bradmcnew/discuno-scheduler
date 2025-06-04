@@ -322,7 +322,7 @@ export const config = {
     "/payment/:path*",
     "/settings/security/:path*",
     "/settings/billing/:path*",
-    "/settings/developer/:path*",
+    // "/settings/developer/:path*",
     "/settings/teams/:path*",
     "/settings/my-account/out-of-office/:path*",
     "/bookings/unconfirmed/:path*",
