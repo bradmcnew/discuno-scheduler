@@ -57,7 +57,9 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
       icon: "key",
       children: [
         { name: "password", href: "/settings/security/password" },
-        { name: "impersonation", href: "/settings/security/impersonation" },
+        // [DISCUNO CUSTOMIZATION] Hide impersonation in simple mode
+        ...(isSimpleMode ? [] : [{ name: "impersonation", href: "/settings/security/impersonation" }]),
+        // [DISCUNO CUSTOMIZATION] End
         { name: "2fa_auth", href: "/settings/security/two-factor-auth" },
       ],
     },
@@ -156,7 +158,9 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
 
   tabs.find((tab) => {
     if (tab.name === "security" && !HOSTED_CAL_FEATURES) {
-      tab.children?.push({ name: "sso_configuration", href: "/settings/security/sso" });
+      if (!isSimpleMode) {
+        tab.children?.push({ name: "sso_configuration", href: "/settings/security/sso" });
+      }
       // TODO: Enable dsync for self hosters
       // tab.children?.push({ name: "directory_sync", href: "/settings/security/dsync" });
     }

@@ -41,6 +41,7 @@ const BLOCKED_FIELDS = [
   "brandColor",
   "darkBrandColor",
   "hideBranding",
+  "disableImpersonation",
 ];
 // [DISCUNO CUSTOMIZATION] End
 
