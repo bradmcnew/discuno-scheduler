@@ -70,13 +70,13 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
           {
             name: "billing",
             href: "/settings/billing",
-            icon: "credit-card",
+            icon: "credit-card" as const,
             children: [{ name: "manage_billing", href: "/settings/billing" }],
           },
           {
             name: "developer",
             href: "/settings/developer",
-            icon: "terminal",
+            icon: "terminal" as const,
             children: [
               //
               { name: "webhooks", href: "/settings/developer/webhooks" },
@@ -138,7 +138,7 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
           {
             name: "teams",
             href: "/teams",
-            icon: "users",
+            icon: "users" as const,
             children: [],
           },
         ]),
