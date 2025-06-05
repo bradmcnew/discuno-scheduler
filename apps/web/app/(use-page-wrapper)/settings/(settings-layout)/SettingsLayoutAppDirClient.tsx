@@ -23,6 +23,9 @@ import { Badge } from "@calcom/ui/components/badge";
 import { Button } from "@calcom/ui/components/button";
 import { ErrorBoundary } from "@calcom/ui/components/errorBoundary";
 import { Icon } from "@calcom/ui/components/icon";
+// [DISCUNO CUSTOMIZATION] Import IconName
+import type { IconName } from "@calcom/ui/components/icon/Icon";
+// [DISCUNO CUSTOMIZATION] End
 import type { VerticalTabItemProps } from "@calcom/ui/components/navigation";
 import { VerticalTabItem } from "@calcom/ui/components/navigation";
 import { Skeleton } from "@calcom/ui/components/skeleton";
@@ -70,13 +73,13 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
           {
             name: "billing",
             href: "/settings/billing",
-            icon: "credit-card" as const,
+            icon: "credit-card" as IconName,
             children: [{ name: "manage_billing", href: "/settings/billing" }],
           },
           {
             name: "developer",
             href: "/settings/developer",
-            icon: "terminal" as const,
+            icon: "terminal" as IconName,
             children: [
               //
               { name: "webhooks", href: "/settings/developer/webhooks" },
@@ -138,7 +141,7 @@ const getTabs = (orgBranding: OrganizationBranding | null) => {
           {
             name: "teams",
             href: "/teams",
-            icon: "users" as const,
+            icon: "users" as IconName,
             children: [],
           },
         ]),

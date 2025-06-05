@@ -9,6 +9,8 @@ import {
 } from "@calcom/features/ee/organizations/context/provider";
 import { KBarTrigger } from "@calcom/features/kbar/Kbar";
 import classNames from "@calcom/ui/classNames";
+// [DISCUNO CUSTOMIZATION] Import IconName
+import type { IconName } from "@calcom/ui/components/icon/Icon";
 
 import { TeamInviteBadge } from "../TeamInviteBadge";
 import type { NavigationItemType } from "./NavigationItem";
@@ -98,8 +100,8 @@ const getNavigationItems = (orgBranding: OrganizationBranding): NavigationItemTy
         {
           name: "routing",
           href: "/routing",
-          icon: "split",
-          isCurrent: ({ pathname }) => pathname?.startsWith("/routing") ?? false,
+          icon: "split" as IconName,
+          isCurrent: ({ pathname }: { pathname: any }) => pathname?.startsWith("/routing") ?? false,
           moreOnMobile: true,
         },
       ]),
