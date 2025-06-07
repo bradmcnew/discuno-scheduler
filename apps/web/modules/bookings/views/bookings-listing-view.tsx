@@ -1,6 +1,8 @@
 "use client";
 
 import { useReactTable, getCoreRowModel, getSortedRowModel, createColumnHelper } from "@tanstack/react-table";
+// [DISCUNO CUSTOMIZATION] Import useSession
+import { useSession } from "next-auth/react";
 import { useMemo, useRef } from "react";
 
 import { WipeMyCalActionButton } from "@calcom/app-store/wipemycalother/components";
@@ -19,6 +21,8 @@ import {
 } from "@calcom/features/data-table";
 import { useSegments } from "@calcom/features/data-table/hooks/useSegments";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+// [DISCUNO CUSTOMIZATION] Import useSession
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
 import useMeQuery from "@calcom/trpc/react/hooks/useMeQuery";
@@ -34,10 +38,6 @@ import SkeletonLoader from "@components/booking/SkeletonLoader";
 import { useFacetedUniqueValues } from "~/bookings/hooks/useFacetedUniqueValues";
 import type { validStatuses } from "~/bookings/lib/validStatuses";
 
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
-
 type BookingListingStatus = (typeof validStatuses)[number];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 
@@ -48,7 +48,7 @@ type RecurringInfo = {
   bookings: { [key: string]: Date[] };
 };
 
-const tabs: (VerticalTabItemProps | HorizontalTabItemProps)[] = [
+const getTabs = (isSimpleMode: boolean): (VerticalTabItemProps | HorizontalTabItemProps)[] => [
   {
     name: "upcoming",
     href: "/bookings/upcoming",
@@ -117,6 +117,12 @@ function BookingsContent({ status }: BookingsProps) {
   const { t } = useLocale();
   const user = useMeQuery().data;
   const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  const tabs = getTabs(isSimpleMode);
+  // [DISCUNO CUSTOMIZATION] End
 
   const eventTypeIds = useFilterValue("eventTypeId", ZMultiSelectFilterValue)?.data as number[] | undefined;
   const teamIds = useFilterValue("teamId", ZMultiSelectFilterValue)?.data as number[] | undefined;
