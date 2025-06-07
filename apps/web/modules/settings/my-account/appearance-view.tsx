@@ -15,6 +15,7 @@ import useGetBrandingColours from "@calcom/lib/getBrandColours";
 import { useHasPaidPlan } from "@calcom/lib/hooks/useHasPaidPlan";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useTheme from "@calcom/lib/hooks/useTheme";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { validateBookerLayouts } from "@calcom/lib/validateBookerLayouts";
 import type { userMetadata } from "@calcom/prisma/zod-utils";
 import { trpc } from "@calcom/trpc/react";
@@ -26,10 +27,6 @@ import { SettingsToggle, ColorPicker, Form } from "@calcom/ui/components/form";
 import { SkeletonButton, SkeletonContainer, SkeletonText } from "@calcom/ui/components/skeleton";
 import { showToast } from "@calcom/ui/components/toast";
 import { useCalcomTheme } from "@calcom/ui/styles";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 const SkeletonLoader = () => {
   return (
@@ -101,6 +98,10 @@ const AppearanceView = ({
     brandColor: user?.brandColor,
     darkBrandColor: user?.darkBrandColor,
   });
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const isSimpleMode = useSimpleMode(session.data);
+  // [DISCUNO CUSTOMIZATION] End
 
   const userAppThemeFormMethods = useForm({
     defaultValues: {
