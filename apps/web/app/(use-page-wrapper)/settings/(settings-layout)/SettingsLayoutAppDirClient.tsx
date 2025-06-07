@@ -1,7 +1,6 @@
 "use client";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ComponentProps } from "react";
@@ -16,6 +15,7 @@ import { getPlaceholderAvatar } from "@calcom/lib/defaultAvatarImage";
 import { getUserAvatarUrl } from "@calcom/lib/getAvatarUrl";
 import { useCompatSearchParams } from "@calcom/lib/hooks/useCompatSearchParams";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { IdentityProvider, UserPermissionRole } from "@calcom/prisma/enums";
 import { trpc } from "@calcom/trpc/react";
 import classNames from "@calcom/ui/classNames";
@@ -30,11 +30,7 @@ import type { VerticalTabItemProps } from "@calcom/ui/components/navigation";
 import { VerticalTabItem } from "@calcom/ui/components/navigation";
 import { Skeleton } from "@calcom/ui/components/skeleton";
 
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
-
-const getTabs = (orgBranding: OrganizationBranding | null) => {
+const getTabs = (orgBranding: OrganizationBranding | null, isSimpleMode: boolean) => {
   const tabs: VerticalTabItemProps[] = [
     {
       name: "my_account",
@@ -208,9 +204,11 @@ const useTabs = ({ isDelegationCredentialEnabled }: { isDelegationCredentialEnab
   const orgBranding = useOrgBranding();
   const isAdmin = session.data?.user.role === UserPermissionRole.ADMIN;
   const isOrgAdminOrOwner = checkAdminOrOwner(orgBranding?.role);
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const isSimpleMode = useSimpleMode(session.data);
 
   const processTabsMemod = useMemo(() => {
-    const processedTabs = getTabs(orgBranding).map((tab) => {
+    const processedTabs = getTabs(orgBranding, isSimpleMode).map((tab) => {
       if (tab.href === "/settings/my-account") {
         return {
           ...tab,
