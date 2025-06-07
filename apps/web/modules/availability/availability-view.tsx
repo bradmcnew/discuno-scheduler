@@ -2,6 +2,7 @@
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { revalidateAvailabilityList } from "app/(use-page-wrapper)/(main-nav)/availability/actions";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -13,15 +14,12 @@ import { ScheduleListItem } from "@calcom/features/schedules/components/Schedule
 import { useCompatSearchParams } from "@calcom/lib/hooks/useCompatSearchParams";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { HttpError } from "@calcom/lib/http-error";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
 import { EmptyScreen } from "@calcom/ui/components/empty-screen";
 import { ToggleGroup } from "@calcom/ui/components/form";
 import { showToast } from "@calcom/ui/components/toast";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 type AvailabilityListProps = {
   me: RouterOutputs["viewer"]["me"]["get"];
@@ -32,6 +30,9 @@ export function AvailabilityList({ availabilities, me }: AvailabilityListProps) 
   const [bulkUpdateModal, setBulkUpdateModal] = useState(false);
   const utils = trpc.useUtils();
   const router = useRouter();
+
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
 
   const deleteMutation = trpc.viewer.availability.schedule.delete.useMutation({
     onMutate: async ({ scheduleId }) => {
@@ -197,6 +198,9 @@ export const AvailabilityCTA = ({ toggleGroupOptions }: AvailabilityCTAProps) =>
   const searchParams = useCompatSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
 
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
