@@ -13,10 +13,12 @@ import { validateIntervalLimitOrder } from "@calcom/lib/intervalLimits/validateI
 import logger from "@calcom/lib/logger";
 import { getTranslation } from "@calcom/lib/server/i18n";
 import { CalVideoSettingsRepository } from "@calcom/lib/server/repository/calVideoSettings";
+// [DISCUNO CUSTOMIZATION] Import shouldApplySimpleMode
 import { validateBookerLayouts } from "@calcom/lib/validateBookerLayouts";
 import type { PrismaClient } from "@calcom/prisma";
 import { WorkflowTriggerEvents } from "@calcom/prisma/client";
-import { SchedulingType, EventTypeAutoTranslatedField } from "@calcom/prisma/enums";
+// [DISCUNO CUSTOMIZATION] Import UserPermissionRole
+import { SchedulingType, EventTypeAutoTranslatedField, UserPermissionRole } from "@calcom/prisma/enums";
 import { eventTypeAppMetadataOptionalSchema } from "@calcom/prisma/zod-utils";
 import { eventTypeLocations } from "@calcom/prisma/zod-utils";
 
@@ -73,8 +75,8 @@ const BLOCKED_FIELDS = [
   "locations",
 ];
 
-const validateSimpleModeRestrictions = (input: TUpdateInputSchema) => {
-  if (!isSimpleMode) return;
+const validateSimpleModeRestrictions = (input: TUpdateInputSchema, isAdmin: boolean) => {
+  if (!isSimpleMode || isAdmin) return;
   // Check for blocked fields in input
   const blockedFieldsPresent = BLOCKED_FIELDS.filter((field) => {
     const fieldValue = input[field as keyof TUpdateInputSchema];
@@ -108,6 +110,7 @@ type User = {
   organizationId: number | null;
   email: SessionUser["email"];
   locale: string;
+  role: SessionUser["role"];
 };
 
 type UpdateOptions = {
@@ -123,7 +126,8 @@ export type UpdateEventTypeReturn = Awaited<ReturnType<typeof updateHandler>>;
 
 export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
   // [DISCUNO CUSTOMIZATION] Validate simple mode restrictions
-  validateSimpleModeRestrictions(input);
+  const isAdmin = ctx.user.role === UserPermissionRole.ADMIN;
+  validateSimpleModeRestrictions(input, isAdmin);
   // [DISCUNO CUSTOMIZATION] End
 
   const {

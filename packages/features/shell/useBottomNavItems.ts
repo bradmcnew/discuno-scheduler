@@ -52,7 +52,7 @@ export function useBottomNavItems({
         }
       : null,
     // [DISCUNO CUSTOMIZATION] Conditionally include view public page, copy public page link, based on simple mode
-    ...(!isSimpleMode
+    ...(!isSimpleMode || isAdmin
       ? [
           {
             name: "view_public_page",

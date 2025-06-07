@@ -18,6 +18,8 @@ import { resizeBase64Image } from "@calcom/lib/server/resizeBase64Image";
 import slugify from "@calcom/lib/slugify";
 import { validateBookerLayouts } from "@calcom/lib/validateBookerLayouts";
 import { prisma } from "@calcom/prisma";
+// [DISCUNO CUSTOMIZATION] Import UserPermissionRole
+import { UserPermissionRole } from "@calcom/prisma/enums";
 import { userMetadata as userMetadataSchema } from "@calcom/prisma/zod-utils";
 import type { TrpcSessionUser } from "@calcom/trpc/server/types";
 
@@ -45,8 +47,8 @@ const BLOCKED_FIELDS = [
 ];
 // [DISCUNO CUSTOMIZATION] End
 
-const validateInput = (input: TUpdateProfileInputSchema) => {
-  if (isSimpleMode) {
+const validateInput = (input: TUpdateProfileInputSchema, isAdmin: boolean) => {
+  if (isSimpleMode && !isAdmin) {
     const blockedFieldsPresent = BLOCKED_FIELDS.filter((field) => {
       const fieldValue = input[field as keyof TUpdateProfileInputSchema];
       return fieldValue !== undefined && fieldValue !== null;
@@ -72,7 +74,8 @@ type UpdateProfileOptions = {
 
 export const updateProfileHandler = async ({ ctx, input }: UpdateProfileOptions) => {
   // [DISCUNO CUSTOMIZATION] Validate input in simple mode
-  validateInput(input);
+  const isAdmin = ctx.user.role === UserPermissionRole.ADMIN;
+  validateInput(input, isAdmin);
   // [DISCUNO CUSTOMIZATION] End
 
   const { user } = ctx;

@@ -3,6 +3,7 @@ import { collectEvents } from "next-collect/server";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { shouldApplySimpleMode } from "@calcom/lib/simple-mode";
 import { extendEventData, nextCollectBasicSettings } from "@calcom/lib/telemetry";
 
 import { csp } from "./lib/csp";
@@ -14,23 +15,6 @@ const safeGet = async <T = any>(key: string): Promise<T | undefined> => {
     // Don't crash if EDGE_CONFIG env var is missing
   }
 };
-
-// [DISCUNO CUSTOMIZATION] Check if user is admin
-/* TODO: Uncomment when ready to test
-const isAdmin = async (req: NextRequest): Promise<boolean> => {
-  try {
-    const token = await getToken({
-      req,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
-
-    return !!token && token.role === "ADMIN";
-  } catch {
-    return false;
-  }
-};
-*/
-// [DISCUNO CUSTOMIZATION] End
 
 // [DISCUNO CUSTOMIZATION] Blocking paths
 // https://mentor.discuno.com/*
@@ -102,10 +86,10 @@ const BLOCKED_EVENT_TABS = ["workflows", "webhooks", "recurring", "limits", "adv
 
 const BLOCKED_DIALOG = ["new", "embed", "duplicate"];
 
-const checkSimplemode = (req: NextRequest): NextResponse | null => {
-  const isSimpleMode = process.env.SIMPLE_MODE === "true";
+const checkSimplemode = async (req: NextRequest): Promise<NextResponse | null> => {
+  const shouldApply: boolean = await shouldApplySimpleMode(req);
 
-  if (!isSimpleMode) {
+  if (!shouldApply) {
     return null;
   }
 
@@ -174,7 +158,7 @@ export function checkStaticFiles(pathname: string) {
 
 const middleware = async (req: NextRequest): Promise<NextResponse<unknown>> => {
   // [DISCUNO CUSTOMIZATION] Route blocking middleware
-  const simpleModeBlocked = checkSimplemode(req);
+  const simpleModeBlocked = await checkSimplemode(req);
   if (simpleModeBlocked) return simpleModeBlocked;
   // [DISCUNO CUSTOMIZATION] End
 
