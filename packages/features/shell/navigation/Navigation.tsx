@@ -8,6 +8,7 @@ import {
   type OrganizationBranding,
 } from "@calcom/features/ee/organizations/context/provider";
 import { KBarTrigger } from "@calcom/features/kbar/Kbar";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import classNames from "@calcom/ui/classNames";
 // [DISCUNO CUSTOMIZATION] Import IconName
 import type { IconName } from "@calcom/ui/components/icon/Icon";
@@ -18,11 +19,10 @@ import { NavigationItem, MobileNavigationItem, MobileNavigationMoreItem } from "
 
 export const MORE_SEPARATOR_NAME = "more";
 
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
-
-const getNavigationItems = (orgBranding: OrganizationBranding): NavigationItemType[] => [
+const getNavigationItems = (
+  orgBranding: OrganizationBranding,
+  isSimpleMode: boolean
+): NavigationItemType[] => [
   {
     name: "event_types_page_title",
     href: "/event-types",
@@ -189,9 +189,16 @@ const platformNavigationItems: NavigationItemType[] = [
 ];
 
 const useNavigationItems = (isPlatformNavigation = false) => {
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
+
   const orgBranding = useOrgBranding();
   return useMemo(() => {
-    const items = !isPlatformNavigation ? getNavigationItems(orgBranding) : platformNavigationItems;
+    const items = !isPlatformNavigation
+      ? getNavigationItems(orgBranding, isSimpleMode)
+      : platformNavigationItems;
 
     const desktopNavigationItems = items.filter((item) => item.name !== MORE_SEPARATOR_NAME);
     const mobileNavigationBottomItems = items.filter(

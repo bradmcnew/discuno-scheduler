@@ -1,9 +1,10 @@
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ROADMAP, DESKTOP_APP_LINK } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import useMeQuery from "@calcom/trpc/react/hooks/useMeQuery";
 import classNames from "@calcom/ui/classNames";
 import { Avatar } from "@calcom/ui/components/avatar";
@@ -21,10 +22,6 @@ import { Icon } from "@calcom/ui/components/icon";
 import { useGetUserAttributes } from "@calcom/web/components/settings/platform/hooks/useGetUserAttributes";
 
 import FreshChatProvider from "../../ee/support/lib/freshchat/FreshChatProvider";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] END
 
 declare global {
   interface Window {
@@ -46,6 +43,12 @@ export function UserDropdown({ small }: UserDropdownProps) {
   const { data: user, isPending } = useMeQuery();
   const pathname = usePathname();
   const isPlatformPages = pathname?.startsWith("/settings/platform");
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
+
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore

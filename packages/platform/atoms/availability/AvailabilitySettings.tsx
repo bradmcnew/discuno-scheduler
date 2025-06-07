@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import type { SetStateAction, Dispatch } from "react";
 import React, { useMemo, useState, useEffect } from "react";
 import { Controller, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
@@ -20,6 +21,7 @@ import WebSchedule, {
 import WebShell from "@calcom/features/shell/Shell";
 import { availabilityAsString } from "@calcom/lib/availability";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { sortAvailabilityStrings } from "@calcom/lib/weekstart";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import type { TimeRange, WorkingHours } from "@calcom/types/schedule";
@@ -39,10 +41,6 @@ import { Shell as PlatformShell } from "../src/components/ui/shell";
 import { cn } from "../src/lib/utils";
 import { Timezone as PlatformTimzoneSelect } from "../timezone/index";
 import type { AvailabilityFormValues } from "./types";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 export type Schedule = {
   id: number;
@@ -287,6 +285,11 @@ export function AvailabilitySettings({
 }: AvailabilitySettingsProps) {
   const [openSidebar, setOpenSidebar] = useState(false);
   const { t, i18n } = useLocale();
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const form = useForm<AvailabilityFormValues>({
     defaultValues: {

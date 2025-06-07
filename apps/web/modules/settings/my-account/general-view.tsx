@@ -9,6 +9,7 @@ import SectionBottomActions from "@calcom/features/settings/SectionBottomActions
 import { formatLocalizedDateTime } from "@calcom/lib/dayjs";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { localeOptions } from "@calcom/lib/i18n";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { nameOfDay } from "@calcom/lib/weekday";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
@@ -22,10 +23,6 @@ import { SkeletonButton, SkeletonContainer, SkeletonText } from "@calcom/ui/comp
 import { showToast } from "@calcom/ui/components/toast";
 
 import TravelScheduleModal from "@components/settings/TravelScheduleModal";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 export type FormValues = {
   locale: {
@@ -106,6 +103,11 @@ const GeneralView = ({ localeProp, user, travelSchedules, revalidatePage }: Gene
   const { update } = useSession();
   const [isUpdateBtnLoading, setIsUpdateBtnLoading] = useState<boolean>(false);
   const [isTZScheduleOpen, setIsTZScheduleOpen] = useState<boolean>(false);
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const mutation = trpc.viewer.me.updateProfile.useMutation({
     onSuccess: async (res) => {

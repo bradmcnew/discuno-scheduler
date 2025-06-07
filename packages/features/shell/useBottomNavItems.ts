@@ -9,6 +9,7 @@ import { showToast } from "@calcom/ui/components/toast";
 import { type NavigationItemType } from "./navigation/NavigationItem";
 
 // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+// leave since useBottomNavItems uses isAdmin
 const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
 // [DISCUNO CUSTOMIZATION] End
 

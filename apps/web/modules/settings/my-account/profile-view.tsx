@@ -18,6 +18,7 @@ import { emailSchema } from "@calcom/lib/emailSchema";
 import { getUserAvatarUrl } from "@calcom/lib/getAvatarUrl";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { md } from "@calcom/lib/markdownIt";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import turndown from "@calcom/lib/turndownService";
 import { IdentityProvider } from "@calcom/prisma/enums";
 import type { RouterOutputs } from "@calcom/trpc/react";
@@ -49,10 +50,6 @@ import SecondaryEmailModal from "@components/settings/SecondaryEmailModal";
 import { UsernameAvailabilityField } from "@components/ui/UsernameAvailability";
 
 import type { TRPCClientErrorLike } from "@trpc/client";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 const SkeletonLoader = () => {
   return (
@@ -95,8 +92,13 @@ export type FormValues = {
 const ProfileView = () => {
   const { t } = useLocale();
   const utils = trpc.useUtils();
-  const { update } = useSession();
+  const session = useSession();
+  const update = session.update;
   const { data: user, isPending } = trpc.viewer.me.get.useQuery({ includePasswordAdded: true });
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const isSimpleMode = useSimpleMode(session.data);
+  // [DISCUNO CUSTOMIZATION] End
 
   const updateProfileMutation = trpc.viewer.me.updateProfile.useMutation({
     onSuccess: async (res) => {
@@ -527,6 +529,11 @@ const ProfileForm = ({
 }) => {
   const { t } = useLocale();
   const [firstRender, setFirstRender] = useState(true);
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const profileFormSchema = z.object({
     username: z.string(),

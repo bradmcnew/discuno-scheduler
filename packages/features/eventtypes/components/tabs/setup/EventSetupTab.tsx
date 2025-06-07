@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { UseFormGetValues, UseFormSetValue, Control, FormState } from "react-hook-form";
@@ -16,6 +17,7 @@ import type {
 import type { FormValues, LocationFormValues } from "@calcom/features/eventtypes/lib/types";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { md } from "@calcom/lib/markdownIt";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { slugify } from "@calcom/lib/slugify";
 import turndown from "@calcom/lib/turndownService";
 import classNames from "@calcom/ui/classNames";
@@ -26,10 +28,6 @@ import { TextField } from "@calcom/ui/components/form";
 import { Select } from "@calcom/ui/components/form";
 import { SettingsToggle } from "@calcom/ui/components/form";
 import { Skeleton } from "@calcom/ui/components/skeleton";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 export type EventSetupTabCustomClassNames = {
   wrapper?: string;
@@ -73,6 +71,11 @@ export const EventSetupTab = (
   const isPlatform = useIsPlatform();
   const formMethods = useFormContext<FormValues>();
   const { eventType, team, urlPrefix, hasOrgBranding, customClassNames, orgId } = props;
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const interfaceLanguageOptions =
     props.localeOptions && props.localeOptions.length > 0

@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import { useMemo, useState, Suspense } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -7,6 +8,7 @@ import type { FormValues } from "@calcom/features/eventtypes/lib/types";
 import type { EventTypeSetupProps } from "@calcom/features/eventtypes/lib/types";
 import WebShell from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { SchedulingType } from "@calcom/prisma/enums";
 import classNames from "@calcom/ui/classNames";
 import { Button } from "@calcom/ui/components/button";
@@ -31,10 +33,6 @@ import { Tooltip } from "@calcom/ui/components/tooltip";
 
 import { Shell as PlatformShell } from "../../../platform/atoms/src/components/ui/shell";
 import { DeleteDialog } from "./dialogs/DeleteDialog";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 type Props = {
   children: React.ReactNode;
@@ -71,6 +69,11 @@ function EventTypeSingleLayout({
 }: Props) {
   const { t } = useLocale();
   const eventTypesLockedByOrg = eventType.team?.parent?.organizationSettings?.lockEventTypeCreationForUsers;
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
