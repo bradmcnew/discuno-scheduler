@@ -1,6 +1,8 @@
 "use client";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+// [DISCUNO CUSTOMIZATION] Import useSession
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { FC } from "react";
@@ -24,6 +26,8 @@ import { useGetTheme } from "@calcom/lib/hooks/useTheme";
 import { useTypedQuery } from "@calcom/lib/hooks/useTypedQuery";
 import { HttpError } from "@calcom/lib/http-error";
 import { parseEventTypeColor } from "@calcom/lib/isEventTypeColor";
+// [DISCUNO CUSTOMIZATION] Import useSimpleMode
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import type { MembershipRole } from "@calcom/prisma/enums";
 import { SchedulingType } from "@calcom/prisma/enums";
 import type { RouterOutputs } from "@calcom/trpc/react";
@@ -87,13 +91,14 @@ const querySchema = z.object({
   teamId: z.nullable(z.coerce.number()).optional().default(null),
 });
 
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
-
 const InfiniteTeamsTab: FC<InfiniteTeamsTabProps> = (props) => {
   const { activeEventTypeGroup } = props;
   const { t } = useLocale();
+
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -257,6 +262,11 @@ export const InfiniteEventTypeList = ({
   isPending,
   debouncedSearchTerm,
 }: InfiniteEventTypeListProps): JSX.Element => {
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
+
   const { t } = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -958,6 +968,9 @@ type Props = {
 
 export const EventTypesCTA = ({ userEventGroupsData }: Omit<Props, "user">) => {
   // [DISCUNO CUSTOMIZATION] Hiding the create button
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+
   if (isSimpleMode) return null;
   // [DISCUNO CUSTOMIZATION] End
 
