@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line @calcom/eslint/deprecated-imports-next-router
 import type { TFunction } from "i18next";
+import { useSession } from "next-auth/react";
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -15,12 +16,9 @@ import type {
 } from "@calcom/features/eventtypes/lib/types";
 import { getPaymentAppData } from "@calcom/lib/getPaymentAppData";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useSimpleMode } from "@calcom/lib/simple-mode";
 import { eventTypeMetaDataSchemaWithTypedApps } from "@calcom/prisma/zod-utils";
 import type { VerticalTabItemProps } from "@calcom/ui/components/navigation";
-
-// [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
-const isSimpleMode = process.env.NEXT_PUBLIC_SIMPLE_MODE === "true";
-// [DISCUNO CUSTOMIZATION] End
 
 type Props = {
   formMethods: UseFormReturn<FormValues>;
@@ -73,17 +71,25 @@ export const useTabsNavigations = ({
 
   const enabledWorkflowsNumber = allActiveWorkflows ? allActiveWorkflows.length : 0;
 
+  // [DISCUNO CUSTOMIZATION] Check if simple mode is enabled
+  const { data: session } = useSession();
+  const isSimpleMode = useSimpleMode(session);
+  // [DISCUNO CUSTOMIZATION] End
+
   const EventTypeTabs = useMemo(() => {
-    const navigation: VerticalTabItemProps[] = getNavigation({
-      t,
-      length,
-      multipleDuration,
-      id: formMethods.getValues("id"),
-      enabledAppsNumber,
-      installedAppsNumber,
-      enabledWorkflowsNumber,
-      availability,
-    });
+    const navigation: VerticalTabItemProps[] = getNavigation(
+      {
+        t,
+        length,
+        multipleDuration,
+        id: formMethods.getValues("id"),
+        enabledAppsNumber,
+        installedAppsNumber,
+        enabledWorkflowsNumber,
+        availability,
+      },
+      isSimpleMode
+    );
 
     // [DISCUNO CUSTOMIZATION] Hide recurring tab in simple mode
     if (!isSimpleMode && !requirePayment) {
@@ -192,15 +198,18 @@ type getNavigationProps = {
   availability: AvailabilityOption | undefined;
 };
 
-function getNavigation({
-  length,
-  id,
-  multipleDuration,
-  t,
-  enabledAppsNumber,
-  installedAppsNumber,
-  enabledWorkflowsNumber,
-}: getNavigationProps) {
+function getNavigation(
+  {
+    length,
+    id,
+    multipleDuration,
+    t,
+    enabledAppsNumber,
+    installedAppsNumber,
+    enabledWorkflowsNumber,
+  }: getNavigationProps,
+  isSimpleMode: boolean
+) {
   const duration = multipleDuration?.map((duration) => ` ${duration}`) || length;
 
   // [DISCUNO CUSTOMIZATION] Hide limits tab in simple mode
